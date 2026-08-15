@@ -1,18 +1,18 @@
 import express from "express";
 
 import {
-  changeSobreity,
-  getSobreity,
-  historySobreity,
-  statsSobreity,
+  changeSobriety,
+  getSobriety,
+  historySobriety,
+  statsSobriety,
 } from "./sobriety.controller.js";
 
 const router = express.Router();
 
 // api/sobriety
-router.get("/", getSobreity);
-router.post("/", changeSobreity);
-router.get("/stats", statsSobreity);
-router.get("/history", historySobreity);
+router.get("/:userId", getSobriety);
+router.post("/:userId", changeSobriety);
+router.get("/stats/:userId", statsSobriety);
+router.get("/history/:userId", historySobriety);
 
 export default router;

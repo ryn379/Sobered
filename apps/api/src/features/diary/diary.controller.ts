@@ -98,7 +98,7 @@ export const getEntryDiary = async (req: Request, res: Response) => {
     const entry = await getDiaryEntryService(entryId);
 
     if (!entry) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "Diary Entry Not Found",
       });
@@ -131,7 +131,7 @@ export const deleteEntryDiary = async (req: Request, res: Response) => {
     const deletedEntry = await deleteDiarySerive(entryId);
 
     if (!deletedEntry) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "Entry Not Found",
       });
@@ -172,9 +172,9 @@ export const updateEntryDiary = async (req: Request, res: Response) => {
     const entry = await updateDiaryService(entryId, content);
 
     if (!entry) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
-        message: "Entry ID Not Found",
+        message: "Entry Not Found",
       });
     }
 

@@ -15,7 +15,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api/v1/health", (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.json({
     success: true,
     message: "Server is working",
