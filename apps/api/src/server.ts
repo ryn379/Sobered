@@ -1,13 +1,13 @@
 import express from "express";
 
-import diaryRouter from "./routes/diary.route.js";
+import diaryRouter from "./features/diary/diary.route.js";
 import emergencyRouter from "./routes/emergency.route.js";
 import familyRouter from "./routes/family.route.js";
 import friendsRouter from "./routes/friends.route.js";
 import groupsRouter from "./routes/groups.route.js";
 import hobbyRouter from "./routes/hobby.route.js";
 import meetingsRouter from "./routes/meetings.route.js";
-import sobrietyRouter from "./routes/sobriety.route.js";
+import sobrietyRouter from "./features/sobriety/sobriety.route.js";
 import sponsorRouter from "./routes/sponsor.route.js";
 import userRouter from "./routes/user.route.js";
 
@@ -33,7 +33,7 @@ app.use("/api/sobriety", sobrietyRouter);
 app.use("/api/sponsor", sponsorRouter);
 app.use("/api/user", userRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8008;
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);

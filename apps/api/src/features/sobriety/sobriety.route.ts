@@ -5,7 +5,7 @@ import {
   getSobreity,
   historySobreity,
   statsSobreity,
-} from "../controllers/sobriety.controller.js";
+} from "./sobriety.controller.js";
 
 const router = express.Router();
 

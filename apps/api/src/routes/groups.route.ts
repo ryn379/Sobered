@@ -14,7 +14,7 @@ const router = express.Router();
 // api/groups
 router.get("/", getAllGroups);
 router.get(":groupId", getGroup);
-router.post(":/groupId", joinGroup);
+router.post("/:groupId", joinGroup);
 router.get(":groupId/members", membersGroup);
 router.get(":groupId/leaders", leaderGroup);
 router.post(":groupId/:userId/assign", assignLeaderGroup);
