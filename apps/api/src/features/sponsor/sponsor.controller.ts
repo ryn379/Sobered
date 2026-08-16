@@ -80,11 +80,11 @@ export const acceptSponsor = async (req: Request, res: Response) => {
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Invalid Request ID",
+        message: "Invalid User ID",
       });
     }
 
-    const entry = await acceptReqService(reqId);
+    const entry = await acceptReqService(userId, reqId);
 
     if (!entry) {
       return res.status(404).json({
@@ -124,7 +124,7 @@ export const declineSponsor = async (req: Request, res: Response) => {
       });
     }
 
-    const entry = await declineReqService(reqId);
+    const entry = await declineReqService(userId, reqId);
 
     if (!entry) {
       return res.status(404).json({
@@ -150,6 +150,13 @@ export const postReqSponsor = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const { recipientId } = req.body;
+
+    if (userId === recipientId) {
+      return res.status(409).json({
+        success: false,
+        message: "Cannot Send Request to Yourself",
+      });
+    }
 
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({

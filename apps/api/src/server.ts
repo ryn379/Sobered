@@ -8,8 +8,8 @@ import groupsRouter from "./routes/groups.route.js";
 import hobbyRouter from "./routes/hobby.route.js";
 import meetingsRouter from "./routes/meetings.route.js";
 import sobrietyRouter from "./features/sobriety/sobriety.route.js";
-import sponsorRouter from "./routes/sponsor.route.js";
-import userRouter from "./routes/user.route.js";
+import sponsorRouter from "./features/sponsor/sponsor.route.js";
+import userRouter from "./features/user/user.route.js";
 
 const app = express();
 

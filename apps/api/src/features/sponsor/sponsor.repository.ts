@@ -42,11 +42,6 @@ export const addSponsorRequestByUserId = async (
   userId: string,
   recipientId: string,
 ): Promise<SponsorRequest | null> => {
-  const userExists = users.find((e) => e.id === userId);
-  const recipientExists = users.find((e) => e.id === recipientId);
-
-  if (!userExists || !recipientExists) return null;
-
   const request: SponsorRequest = {
     id: `request_${String(sponsorRequests.length + 1).padStart(3, "0")}`,
     requesterId: userId,
@@ -67,9 +62,10 @@ export const acceptSponsorRequestByReqId = async (
   const entry = sponsorRequests.find((e) => e.id === reqId);
 
   if (!entry) return null;
-  if (entry.status !== "pending") return null;
+
   entry.status = "accepted";
   entry.updatedAt = new Date().toISOString();
+
   return entry;
 };
 
@@ -78,10 +74,13 @@ export const declineSponsorRequestByReqId = async (
 ): Promise<SponsorRequest | null> => {
   const entry = sponsorRequests.find((e) => e.id === reqId);
 
-  if (!entry) return null;
-  if (entry.status !== "pending") return null;
-  if (entry) entry.status = "rejected";
+  if (!entry) {
+    return null;
+  }
+
+  entry.status = "rejected";
   entry.updatedAt = new Date().toISOString();
+
   return entry;
 };
 
@@ -99,4 +98,26 @@ export const addSponsorRelationship = async (
   sponsor.push(relationship);
 
   return relationship;
+};
+
+export const getSponsorRequestByReqId = async (
+  reqId: string,
+): Promise<SponsorRequest | null> => {
+  const request = sponsorRequests.find((e) => e.id === reqId);
+
+  return request ?? null;
+};
+
+export const getPendingSponsorRequest = async (
+  requesterId: string,
+  recipientId: string,
+): Promise<SponsorRequest | null> => {
+  const request = sponsorRequests.find(
+    (e) =>
+      e.requesterId === requesterId &&
+      e.recipientId === recipientId &&
+      e.status === "pending",
+  );
+
+  return request ?? null;
 };

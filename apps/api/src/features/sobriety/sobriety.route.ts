@@ -12,7 +12,7 @@ const router = express.Router();
 // api/sobriety
 router.get("/:userId", getSobriety);
 router.post("/:userId", changeSobriety);
-router.get("/stats/:userId", statsSobriety);
-router.get("/history/:userId", historySobriety);
+router.get("/:userId/stats", statsSobriety);
+router.get("/:userId/history", historySobriety);
 
 export default router;

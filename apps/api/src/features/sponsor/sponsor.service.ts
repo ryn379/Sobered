@@ -6,9 +6,12 @@ import {
   addSponsorRelationship,
   addSponsorRequestByUserId,
   declineSponsorRequestByReqId,
+  getPendingSponsorRequest,
   getSponsorByUserId,
   getSponsorReqsAllByUserId,
+  getSponsorRequestByReqId,
 } from "./sponsor.repository.js";
+import { findUserByUserId } from "../user/user.repository.js";
 
 export const getSponsorService = async (
   userId: string,
@@ -28,33 +31,73 @@ export const postReqServiece = async (
   userId: string,
   recipientId: string,
 ): Promise<SponsorRequest | null> => {
-  const entry = await addSponsorRequestByUserId(userId, recipientId);
+  if (userId === recipientId) return null;
 
+  const sponsor = await getSponsorByUserId(userId);
+  const requester = await findUserByUserId(userId);
+  const recipient = await findUserByUserId(recipientId);
+
+  if (!requester || !recipient) return null;
+
+  if (sponsor) return null;
+
+  const existingRequest = await getPendingSponsorRequest(userId, recipientId);
+
+  if (existingRequest) return null;
+
+  const entry = await addSponsorRequestByUserId(userId, recipientId);
   return entry;
 };
 
 export const acceptReqService = async (
+  userId: string,
   reqId: string,
 ): Promise<SponsorRequest | null> => {
-  const request = await acceptSponsorRequestByReqId(reqId);
+  const request = await getSponsorRequestByReqId(reqId);
 
   if (!request) {
     return null;
   }
 
-  await addSponsorRelationship(request.requesterId, request.recipientId);
+  if (request.recipientId !== userId) {
+    return null;
+  }
 
-  return request;
+  if (request.status !== "pending") {
+    return null;
+  }
+
+  const updatedRequest = await acceptSponsorRequestByReqId(reqId);
+
+  if (!updatedRequest) {
+    return null;
+  }
+
+  await addSponsorRelationship(
+    updatedRequest.requesterId,
+    updatedRequest.recipientId,
+  );
+
+  return updatedRequest;
 };
 
 export const declineReqService = async (
+  userId: string,
   reqId: string,
 ): Promise<SponsorRequest | null> => {
-  const request = await declineSponsorRequestByReqId(reqId);
+  const request = await getSponsorRequestByReqId(reqId);
 
   if (!request) {
     return null;
   }
 
-  return request;
+  if (request.recipientId !== userId) {
+    return null;
+  }
+
+  if (request.status !== "pending") {
+    return null;
+  }
+
+  return declineSponsorRequestByReqId(reqId);
 };
