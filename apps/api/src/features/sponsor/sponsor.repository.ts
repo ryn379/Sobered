@@ -19,6 +19,14 @@ export const getSponsorByUserId = async (
   return sponsorEntry ?? null;
 };
 
+export const getMenteeByUserId = async (userId: string): Promise<string[]> => {
+  const entries = sponsor
+    .filter((entry) => entry.sponsorId === userId)
+    .map((entry) => entry.menteeId);
+
+  return entries;
+};
+
 export const getSponsorReqsAllByUserId = async (
   userId: string,
 ): Promise<User[]> => {
