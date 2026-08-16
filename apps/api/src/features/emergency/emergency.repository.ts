@@ -23,3 +23,49 @@ export const postEmergencyRequestByUserId = async (
   emergencyRequests.push(emergency);
   return emergency;
 };
+
+export const acceptEmergencyRequestByReqId = async (
+  userId: string,
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find((e) => e.id === reqId);
+
+  if (!request || request.status !== "OPEN") return null;
+
+  request.status = "ACCEPTED";
+  request.acceptedBy = userId;
+  return request;
+};
+
+export const getAcceptedEmergencyByUserId = async (
+  userId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find(
+    (e) => e.acceptedBy === userId && e.status === "ACCEPTED",
+  );
+
+  return request ?? null;
+};
+
+export const getEmergencyRequestByReqId = async (
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find((e) => e.id === reqId);
+
+  return request ?? null;
+};
+
+export const escalateEmergencyRequestByReqId = async (
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find((e) => e.id === reqId);
+
+  if (!request) return null;
+
+  if (request.status !== "OPEN") {
+    return null;
+  }
+  request.status = "ESCALATED";
+
+  return request;
+};

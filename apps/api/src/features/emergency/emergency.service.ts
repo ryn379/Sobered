@@ -1,7 +1,11 @@
 import { type EmergencyRequest } from "./emergency.mock.js";
 import { type User } from "../user/user.mock.js";
 import {
+  acceptEmergencyRequestByReqId,
+  escalateEmergencyRequestByReqId,
+  getAcceptedEmergencyByUserId,
   getAllOpenEmergencyRequests,
+  getEmergencyRequestByReqId,
   postEmergencyRequestByUserId,
 } from "./emergency.repository.js";
 import { getFriendAllByUserId } from "../friend/friend.repository.js";
@@ -72,4 +76,68 @@ export const postEmergencyRequestService = async (
   const request = await postEmergencyRequestByUserId(userId, type);
 
   return request;
+};
+
+export const acceptEmergencyRequestService = async (
+  userId: string,
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    console.log("user does not exist");
+    return null;
+  }
+
+  const request = await getEmergencyRequestByReqId(reqId);
+
+  if (!request) {
+    console.log("request does not exist");
+    return null;
+  }
+  if (request.userId === userId) {
+    console.log("User cannot accept their own request");
+    return null;
+  }
+  const existingAccepted = await getAcceptedEmergencyByUserId(userId);
+
+  if (existingAccepted) {
+    console.log("User has already accepted one emergency");
+    return null;
+  }
+  return await acceptEmergencyRequestByReqId(userId, reqId);
+};
+
+export const escalateEmergencyRequestService = async (
+  userId: string,
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    console.log("user does not exist");
+    return null;
+  }
+
+  const request = await getEmergencyRequestByReqId(reqId);
+
+  if (!request) {
+    console.log("request does not exist");
+    return null;
+  }
+  if (request.status !== "OPEN") {
+    console.log("Request is not OPEN");
+    return null;
+  }
+
+  const isProfessional = user.role === "PROFESSIONAL";
+
+  const menteeIds = await getMenteeByUserId(userId);
+  const isSponsor = menteeIds.includes(request.userId);
+
+  if (!isProfessional && !isSponsor) {
+    return null;
+  }
+
+  return await escalateEmergencyRequestByReqId(reqId);
 };
