@@ -44,4 +44,11 @@ export const users: User[] = [
     role: "RECOVERING_USER",
     createdAt: "2026-07-12T16:20:00.000Z",
   },
+  {
+    id: "user_006",
+    username: "miranda_support",
+    email: "miranda@example.com",
+    role: "FAMILY_MEMBER",
+    createdAt: "2026-07-12T16:20:00.000Z",
+  },
 ];

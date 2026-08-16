@@ -3,7 +3,7 @@ import express from "express";
 import diaryRouter from "./features/diary/diary.route.js";
 import emergencyRouter from "./routes/emergency.route.js";
 import familyRouter from "./routes/family.route.js";
-import friendsRouter from "./routes/friends.route.js";
+import friendsRouter from "./features/friend/friend.route.js";
 import groupsRouter from "./routes/groups.route.js";
 import hobbyRouter from "./routes/hobby.route.js";
 import meetingsRouter from "./routes/meetings.route.js";
@@ -25,7 +25,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/diary", diaryRouter);
 app.use("/api/emergency", emergencyRouter);
 app.use("/api/family", familyRouter);
-app.use("/api/freind", friendsRouter);
+app.use("/api/friend", friendsRouter);
 app.use("/api/group", groupsRouter);
 app.use("/api/hobby", hobbyRouter);
 app.use("/api/meeting", meetingsRouter);
