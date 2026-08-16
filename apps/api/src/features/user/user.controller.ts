@@ -12,7 +12,7 @@ export const Userhome = async (req: Request, res: Response) => {
       });
     }
 
-    const entry = userFindService(userId);
+    const entry = await userFindService(userId);
 
     if (!entry) {
       return res.status(404).json({
