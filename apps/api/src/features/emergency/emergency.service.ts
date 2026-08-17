@@ -2,6 +2,7 @@ import { type EmergencyRequest } from "./emergency.mock.js";
 import { type User } from "../user/user.mock.js";
 import {
   acceptEmergencyRequestByReqId,
+  closeEmergencyRequestByReqId,
   escalateEmergencyRequestByReqId,
   getAcceptedEmergencyByUserId,
   getAllOpenEmergencyRequests,
@@ -72,7 +73,16 @@ export const getAllEmergencyRequestService = async (
 export const postEmergencyRequestService = async (
   userId: string,
   type: "CRAVING" | "EMOTIONAL_SUPPORT" | "PROFESSIONAL_HELP",
-): Promise<EmergencyRequest> => {
+): Promise<EmergencyRequest | null> => {
+  const requests = await getAllOpenEmergencyRequests();
+
+  const alreadyRequest = requests.find((e) => e.userId === userId);
+
+  if (alreadyRequest) {
+    console.log("Request of User ID already Exists");
+    return null;
+  }
+
   const request = await postEmergencyRequestByUserId(userId, type);
 
   return request;
@@ -140,4 +150,35 @@ export const escalateEmergencyRequestService = async (
   }
 
   return await escalateEmergencyRequestByReqId(reqId);
+};
+
+export const closeEmergencyRequestService = async (
+  userId: string,
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    console.log("User Does Not Exist");
+    return null;
+  }
+
+  const request = await getEmergencyRequestByReqId(reqId);
+
+  if (!request) {
+    console.log("Request Does Not Exist");
+    return null;
+  }
+
+  const isAcceptedByUser = request.acceptedBy === userId;
+  const isUser = request.userId === userId;
+
+  if (!isAcceptedByUser && !isUser) {
+    console.log("User is not allowed to close this request");
+    return null;
+  }
+
+  const entry = await closeEmergencyRequestByReqId(reqId);
+
+  return entry;
 };

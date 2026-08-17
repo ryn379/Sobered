@@ -69,3 +69,17 @@ export const escalateEmergencyRequestByReqId = async (
 
   return request;
 };
+
+export const closeEmergencyRequestByReqId = async (
+  reqId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find((e) => e.id === reqId);
+
+  if (request) {
+    request.status = "CLOSED";
+    request.closedAt = new Date().toISOString();
+    return request;
+  }
+
+  return null;
+};
