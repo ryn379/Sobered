@@ -6,7 +6,7 @@ export interface Family {
   createdAt: string;
 }
 
-export const family: Family[] = [
+export const families: Family[] = [
   {
     id: "family_001",
     recoveringUserId: "user_001",

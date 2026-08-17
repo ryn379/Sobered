@@ -2,7 +2,7 @@ import express from "express";
 
 import diaryRouter from "./features/diary/diary.route.js";
 import emergencyRouter from "./features/emergency/emergency.route.js";
-import familyRouter from "./routes/family.route.js";
+import familyRouter from "./features/family/family.route.js";
 import friendsRouter from "./features/friend/friend.route.js";
 import groupsRouter from "./routes/groups.route.js";
 import hobbyRouter from "./routes/hobby.route.js";
