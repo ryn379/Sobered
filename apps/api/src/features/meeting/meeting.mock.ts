@@ -1,4 +1,5 @@
 export type MeetingType = "RECOVERY" | "FAMILY";
+export type MeetingStatus = "SCHEDULED" | "LIVE" | "ENDED";
 
 export interface Meeting {
   id: string;
@@ -6,6 +7,7 @@ export interface Meeting {
   title: string;
   description: string;
   type: MeetingType;
+  status: MeetingStatus;
   scheduledAt: string;
   durationMinutes: number;
   createdAt: string;
@@ -24,6 +26,7 @@ export const meetings: Meeting[] = [
     title: "Evening Recovery Meeting",
     description: "An anonymous meeting to discuss difficulties and progress.",
     type: "RECOVERY",
+    status: "LIVE",
     scheduledAt: "2026-08-15T18:00:00.000Z",
     durationMinutes: 60,
     createdAt: "2026-08-01T10:00:00.000Z",
@@ -34,6 +37,7 @@ export const meetings: Meeting[] = [
     title: "Daily Check-In",
     description: "Short daily meeting focused on accountability.",
     type: "RECOVERY",
+    status: "LIVE",
     scheduledAt: "2026-08-15T20:00:00.000Z",
     durationMinutes: 45,
     createdAt: "2026-08-05T10:00:00.000Z",
@@ -44,6 +48,7 @@ export const meetings: Meeting[] = [
     title: "Family Support Circle",
     description: "A private meeting for family members affected by alcoholism.",
     type: "FAMILY",
+    status: "LIVE",
     scheduledAt: "2026-08-16T17:00:00.000Z",
     durationMinutes: 60,
     createdAt: "2026-08-05T10:00:00.000Z",

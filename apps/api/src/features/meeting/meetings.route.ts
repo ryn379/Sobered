@@ -1,17 +1,23 @@
 import express from "express";
 import {
   getAllMeeting,
-  getDetailMeeting,
+  getMembersMeeting,
+  getMeeting,
   joinMeeting,
   leaveMeeting,
-} from "../controllers/meetings.controller.js";
+  startMeeting,
+  endMeeting,
+} from "./meetings.controller.js";
 
 const router = express.Router();
 
 // api/meeting
-router.get("/", getAllMeeting);
-router.post("/:meetId/join", joinMeeting);
-router.post("/:meetId/leave", leaveMeeting);
-router.get("/:meetId", getDetailMeeting);
+router.get("/:userId", getAllMeeting);
+router.get("/:userId/:meetId/meet", getMeeting);
+router.post("/:userId/:meetId/join", joinMeeting);
+router.post("/:userId/:meetId/leave", leaveMeeting);
+router.get("/:userId/:meetId/member", getMembersMeeting);
+router.patch("/:userId/:meetId/start", startMeeting);
+router.patch("/:userId/:meetId/end", endMeeting);
 
 export default router;
