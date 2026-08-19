@@ -1,20 +1,23 @@
 import type { Request, Response } from "express";
 import {
   createHobbyService,
-  getHobbiesService,
-  getTypeHobbyService,
-  getTypesHobbyService,
+  deleteHobbyService,
+  getAnalysisHobbyService,
+  getHobbyTypeService,
+  getHobbyTypesService,
+  getUserHobbiesService,
   getUserHobbyService,
+  updateHobbyProgressService,
   updateHobbyService,
 } from "./hobby.service.js";
 
-export const getTypesHobby = async (req: Request, res: Response) => {
+export const getTypesHobby = async (_req: Request, res: Response) => {
   try {
-    const types = await getTypesHobbyService();
+    const types = await getHobbyTypesService();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: types,
+      types,
     });
   } catch (err: any) {
     console.log(err.message);
@@ -27,27 +30,27 @@ export const getTypesHobby = async (req: Request, res: Response) => {
 
 export const getTypeHobby = async (req: Request, res: Response) => {
   try {
-    const { hobbyId } = req.params;
+    const { hobbyTypeId } = req.params;
 
-    if (!hobbyId || typeof hobbyId !== "string") {
+    if (!hobbyTypeId || typeof hobbyTypeId !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Invalid Hobby ID",
+        message: "Invalid Hobby Type ID",
       });
     }
 
-    const hobby = await getTypeHobbyService(hobbyId);
+    const hobbyType = await getHobbyTypeService(hobbyTypeId);
 
-    if (!hobby) {
+    if (!hobbyType) {
       return res.status(404).json({
         success: false,
-        message: "Hobby Not Found",
+        message: "Use or Hobby Not Found",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: hobby,
+      data: hobbyType,
     });
   } catch (err: any) {
     console.log(err.message);
@@ -58,7 +61,7 @@ export const getTypeHobby = async (req: Request, res: Response) => {
   }
 };
 
-export const getHobbies = async (req: Request, res: Response) => {
+export const getUserHobbies = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
@@ -69,11 +72,18 @@ export const getHobbies = async (req: Request, res: Response) => {
       });
     }
 
-    const hobbies = await getHobbiesService(userId);
+    const userHobbies = await getUserHobbiesService(userId);
+
+    if (!userHobbies) {
+      return res.status(404).json({
+        success: false,
+        message: "User or Hobby Not Found",
+      });
+    }
 
     res.status(200).json({
       success: true,
-      data: hobbies,
+      data: userHobbies,
     });
   } catch (err: any) {
     console.log(err.message);
@@ -88,6 +98,13 @@ export const getUserHobby = async (req: Request, res: Response) => {
   try {
     const { userId, hobbyId } = req.params;
 
+    if (!hobbyId || typeof hobbyId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Hobby ID",
+      });
+    }
+
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
         success: false,
@@ -95,17 +112,10 @@ export const getUserHobby = async (req: Request, res: Response) => {
       });
     }
 
-    if (!hobbyId || typeof hobbyId !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid HobbyID",
-      });
-    }
-
     const hobby = await getUserHobbyService(userId, hobbyId);
 
     if (!hobby) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "User or Hobby Not Found",
       });
@@ -127,8 +137,14 @@ export const getUserHobby = async (req: Request, res: Response) => {
 export const createHobby = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
+    const { hobbyTypeId, goal } = req.body;
 
-    const { hobbyId, goal } = req.body;
+    if (!hobbyTypeId || typeof hobbyTypeId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Hobby Type ID",
+      });
+    }
 
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
@@ -136,14 +152,6 @@ export const createHobby = async (req: Request, res: Response) => {
         message: "Invalid User ID",
       });
     }
-
-    if (!hobbyId || typeof hobbyId !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Hobby ID",
-      });
-    }
-
     if (!goal || typeof goal !== "string") {
       return res.status(400).json({
         success: false,
@@ -151,7 +159,7 @@ export const createHobby = async (req: Request, res: Response) => {
       });
     }
 
-    const hobby = await createHobbyService(userId, hobbyId, goal);
+    const hobby = await createHobbyService(userId, hobbyTypeId, goal);
 
     if (!hobby) {
       return res.status(404).json({
@@ -178,17 +186,17 @@ export const updateHobby = async (req: Request, res: Response) => {
     const { userId, hobbyId } = req.params;
     const { goal, description } = req.body;
 
-    if (!userId || typeof userId !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid User ID",
-      });
-    }
-
     if (!hobbyId || typeof hobbyId !== "string") {
       return res.status(400).json({
         success: false,
         message: "Invalid Hobby ID",
+      });
+    }
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
       });
     }
 
@@ -211,13 +219,153 @@ export const updateHobby = async (req: Request, res: Response) => {
     if (!hobby) {
       return res.status(404).json({
         success: false,
-        message: "Hobby Not Found",
+        message: "User or Hobby Not Found",
       });
     }
 
     return res.status(200).json({
       success: true,
       data: hobby,
+    });
+  } catch (err: any) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const updateProgressHobby = async (req: Request, res: Response) => {
+  try {
+    const { userId, hobbyId } = req.params;
+    const { progress, note } = req.body;
+
+    if (!hobbyId || typeof hobbyId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Hobby ID",
+      });
+    }
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    if (typeof progress !== "number" || Number.isNaN(progress)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Progress",
+      });
+    }
+
+    if (!note || typeof note !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const hobby = await updateHobbyProgressService(
+      userId,
+      hobbyId,
+      progress,
+      note,
+    );
+
+    if (!hobby) {
+      return res.status(404).json({
+        success: false,
+        message: "User or Hobby Not Found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: hobby,
+    });
+  } catch (err: any) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const deleteHobby = async (req: Request, res: Response) => {
+  try {
+    const { userId, hobbyId } = req.params;
+
+    if (!hobbyId || typeof hobbyId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Hobby ID",
+      });
+    }
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const hobby = await deleteHobbyService(userId, hobbyId);
+
+    if (!hobby) {
+      return res.status(404).json({
+        success: false,
+        message: "User or Hobby Not Found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: hobby,
+    });
+  } catch (err: any) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getAnalysisHobby = async (req: Request, res: Response) => {
+  try {
+    const { userId, hobbyId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    if (!hobbyId || typeof hobbyId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Hobby ID",
+      });
+    }
+
+    const analysis = await getAnalysisHobbyService(userId, hobbyId);
+
+    if (!analysis) {
+      return res.status(404).json({
+        success: false,
+        message: "User or Hobby Not Found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: analysis,
     });
   } catch (err: any) {
     console.log(err.message);
@@ -228,7 +376,3 @@ export const updateHobby = async (req: Request, res: Response) => {
     });
   }
 };
-
-export const deleteHobby = (req: Request, res: Response) => {};
-
-export const updateProgressHobby = (req: Request, res: Response) => {};

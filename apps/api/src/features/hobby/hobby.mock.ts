@@ -1,19 +1,21 @@
-export interface UpdateHobby {
-  description?: string;
-  goal?: string;
-  progress?: number;
-}
-
 export interface PredefinedHobby {
   id: string;
   name: string;
   description: string;
 }
 
+export interface HobbyProgress {
+  id: string;
+  hobbyId: string;
+  progress: number;
+  note: string;
+  recordedAt: string;
+}
+
 export interface Hobby {
   id: string;
   userId: string;
-  hobbyId: string;
+  hobbyTypeId: string;
   name: string;
   description: string;
   goal: string;
@@ -105,7 +107,7 @@ export const hobbies: Hobby[] = [
   {
     id: "hobby_001",
     userId: "user_001",
-    hobbyId: "hobby_type_001",
+    hobbyTypeId: "hobby_type_001",
     name: "Programming",
     description: "Learning programming and building software projects.",
     goal: "Build my first full-stack application.",
@@ -117,7 +119,7 @@ export const hobbies: Hobby[] = [
   {
     id: "hobby_002",
     userId: "user_002",
-    hobbyId: "hobby_type_004",
+    hobbyTypeId: "hobby_type_004",
     name: "Running",
     description: "Running regularly to improve fitness and endurance.",
     goal: "Run 100 km this month.",
@@ -129,7 +131,7 @@ export const hobbies: Hobby[] = [
   {
     id: "hobby_003",
     userId: "user_004",
-    hobbyId: "hobby_type_012",
+    hobbyTypeId: "hobby_type_012",
     name: "Chess",
     description: "Playing chess and improving strategic thinking.",
     goal: "Reach a 1200 rating.",
@@ -137,5 +139,29 @@ export const hobbies: Hobby[] = [
     currentStreak: 8,
     createdAt: "2026-08-01T10:00:00.000Z",
     updatedAt: "2026-08-14T18:00:00.000Z",
+  },
+];
+
+export const hobbyProgress: HobbyProgress[] = [
+  {
+    id: "progress_001",
+    hobbyId: "hobby_001",
+    progress: 10,
+    note: "Started learning TypeScript.",
+    recordedAt: "2026-08-01T10:00:00.000Z",
+  },
+  {
+    id: "progress_002",
+    hobbyId: "hobby_001",
+    progress: 20,
+    note: "Built my first Express API.",
+    recordedAt: "2026-08-05T10:00:00.000Z",
+  },
+  {
+    id: "progress_003",
+    hobbyId: "hobby_001",
+    progress: 35,
+    note: "Finished authentication.",
+    recordedAt: "2026-08-14T10:00:00.000Z",
   },
 ];
