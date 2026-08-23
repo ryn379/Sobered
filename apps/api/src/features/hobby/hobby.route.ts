@@ -20,8 +20,8 @@ router.get("/:userId", getUserHobbies);
 router.get("/:userId/:hobbyId", getUserHobby);
 router.get("/:userId/:hobbyId/analysis", getAnalysisHobby);
 router.post("/:userId", createHobby);
-router.patch("/:userId/:hobbyId/update", updateHobby);
+router.patch("/:userId/:hobbyId", updateHobby);
 router.patch("/:userId/:hobbyId/progress", updateProgressHobby);
-router.delete("/:userId/:hobbyId/delete", deleteHobby);
+router.delete("/:userId/:hobbyId", deleteHobby);
 
 export default router;
