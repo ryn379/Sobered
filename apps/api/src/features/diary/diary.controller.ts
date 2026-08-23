@@ -86,7 +86,14 @@ export const entryDiary = async (req: Request, res: Response) => {
 
 export const getEntryDiary = async (req: Request, res: Response) => {
   try {
-    const { entryId } = req.params;
+    const { userId, entryId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Entry ID is Invalid",
+      });
+    }
 
     if (!entryId || typeof entryId !== "string") {
       return res.status(400).json({
@@ -95,7 +102,7 @@ export const getEntryDiary = async (req: Request, res: Response) => {
       });
     }
     console.log(entryId);
-    const entry = await getDiaryEntryService(entryId);
+    const entry = await getDiaryEntryService(userId, entryId);
 
     if (!entry) {
       return res.status(404).json({
@@ -117,43 +124,17 @@ export const getEntryDiary = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteEntryDiary = async (req: Request, res: Response) => {
+export const updateEntryDiary = async (req: Request, res: Response) => {
   try {
-    const { entryId } = req.params;
+    const { userId, entryId } = req.params;
+    const { content } = req.body;
 
-    if (!entryId || typeof entryId !== "string") {
+    if (!userId || typeof userId !== "string") {
       return res.status(400).json({
         success: false,
         message: "Entry ID is Invalid",
       });
     }
-
-    const deletedEntry = await deleteDiarySerive(entryId);
-
-    if (!deletedEntry) {
-      return res.status(404).json({
-        success: false,
-        message: "Entry Not Found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: deletedEntry,
-    });
-  } catch (err: any) {
-    console.log(err.message);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-export const updateEntryDiary = async (req: Request, res: Response) => {
-  try {
-    const { entryId } = req.params;
-    const { content } = req.body;
 
     if (!entryId || typeof entryId !== "string") {
       return res.status(400).json({
@@ -169,7 +150,7 @@ export const updateEntryDiary = async (req: Request, res: Response) => {
       });
     }
 
-    const entry = await updateDiaryService(entryId, content);
+    const entry = await updateDiaryService(userId, entryId, content);
 
     if (!entry) {
       return res.status(404).json({
@@ -181,6 +162,46 @@ export const updateEntryDiary = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       data: entry,
+    });
+  } catch (err: any) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const deleteEntryDiary = async (req: Request, res: Response) => {
+  try {
+    const { userId, entryId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "User Id Invalid",
+      });
+    }
+
+    if (!entryId || typeof entryId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Entry ID is Invalid",
+      });
+    }
+
+    const deletedEntry = await deleteDiarySerive(userId, entryId);
+
+    if (!deletedEntry) {
+      return res.status(404).json({
+        success: false,
+        message: "Entry Not Found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: deletedEntry,
     });
   } catch (err: any) {
     console.log(err.message);

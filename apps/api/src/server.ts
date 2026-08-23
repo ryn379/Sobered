@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 import diaryRouter from "./features/diary/diary.route.js";
 import emergencyRouter from "./features/emergency/emergency.route.js";
@@ -14,6 +15,7 @@ import userRouter from "./features/user/user.route.js";
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/api/health", (_req, res) => {
   res.json({

@@ -12,8 +12,8 @@ const router = express.Router();
 // api/diary
 router.get("/:userId", getDiary);
 router.post("/:userId", entryDiary);
-router.get("/entry/:entryId", getEntryDiary);
-router.patch("/entry/:entryId", updateEntryDiary);
-router.delete("/entry/:entryId", deleteEntryDiary);
+router.get("/:userId/:entryId", getEntryDiary);
+router.patch("/:userId/:entryId", updateEntryDiary);
+router.delete("/:userId/:entryId", deleteEntryDiary);
 
 export default router;
