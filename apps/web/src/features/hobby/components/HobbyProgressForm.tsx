@@ -42,21 +42,26 @@ export const HobbyProgressForm = ({ onSubmit }: HobbyProgressFormProps) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-[#D8CCB5] bg-[#FBF6E9] p-6"
+      className="rounded-md border border-[#2C3038] bg-[#1C1F26] p-6"
     >
-      <h2 className="text-2xl font-semibold text-[#2F2A35]">Update Progress</h2>
+      <h2
+        style={{ fontFamily: "'Fraunces', serif" }}
+        className="text-2xl font-semibold text-[#ECEDF0]"
+      >
+        Update Progress
+      </h2>
 
       {/* Progress */}
       <div className="mt-6">
         <div className="flex justify-between">
           <label
             htmlFor="progress"
-            className="text-sm font-medium text-[#5B5B72]"
+            className="text-sm font-medium text-[#9199A6]"
           >
             Progress
           </label>
 
-          <span className="font-semibold text-[#2F2A35]">{progress}%</span>
+          <span className="font-semibold text-[#ECEDF0]">{progress}%</span>
         </div>
 
         <input
@@ -67,7 +72,7 @@ export const HobbyProgressForm = ({ onSubmit }: HobbyProgressFormProps) => {
           value={progress}
           onChange={(event) => setProgress(Number(event.target.value))}
           disabled={loading}
-          className="mt-3 w-full"
+          className="mt-3 w-full accent-[#6E8CA0]"
         />
       </div>
 
@@ -75,7 +80,7 @@ export const HobbyProgressForm = ({ onSubmit }: HobbyProgressFormProps) => {
       <div className="mt-6">
         <label
           htmlFor="progress-note"
-          className="mb-2 block text-sm font-medium text-[#5B5B72]"
+          className="mb-2 block text-sm font-medium text-[#9199A6]"
         >
           What did you do?
         </label>
@@ -87,16 +92,16 @@ export const HobbyProgressForm = ({ onSubmit }: HobbyProgressFormProps) => {
           onChange={(event) => setNote(event.target.value)}
           disabled={loading}
           placeholder="I practiced programming for 45 minutes..."
-          className="w-full resize-none rounded-md border border-[#C9B98C] bg-white px-4 py-3 text-[#2F2A35]"
+          className="w-full resize-none rounded-md border border-[#2C3038] bg-[#14161B] px-4 py-3 text-[#ECEDF0] placeholder:text-[#5F6672] outline-none focus:border-[#6E8CA0]"
         />
       </div>
 
-      {error && <p className="mt-4 text-sm text-[#B5495B]">{error}</p>}
+      {error && <p className="mt-4 text-sm text-[#C97880]">{error}</p>}
 
       <button
         type="submit"
         disabled={loading}
-        className="mt-5 rounded-md bg-[#5B5B72] px-5 py-3 text-white disabled:opacity-50"
+        className="mt-5 rounded-md bg-[#6E8CA0] px-5 py-3 font-medium text-[#14161B] transition hover:bg-[#89A8BC] disabled:opacity-50"
       >
         {loading ? "Saving..." : "Save Progress"}
       </button>

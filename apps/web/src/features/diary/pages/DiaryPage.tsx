@@ -9,21 +9,16 @@ export const DiaryPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F3EAD6]">
-        <p
-          style={{ fontFamily: "'Caveat', cursive" }}
-          className="text-2xl text-[#5B5B72]"
-        >
-          turning the page...
-        </p>
+      <div className="flex min-h-screen items-center justify-center bg-[#14161B]">
+        <p className="text-sm text-[#9199A6]">Loading entries…</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F3EAD6]">
-        <p className="rounded-sm border border-[#B5495B]/30 bg-[#FBF6E9] px-5 py-3 text-[#B5495B]">
+      <div className="flex min-h-screen items-center justify-center bg-[#14161B]">
+        <p className="rounded-md border border-[#C97880]/30 bg-[#1C1F26] px-5 py-3 text-sm text-[#C97880]">
           {error}
         </p>
       </div>
@@ -31,28 +26,25 @@ export const DiaryPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#F3EAD6] px-4 py-12">
-      <div
-        className="mx-auto max-w-2xl rounded-sm bg-[#FBF6E9] p-8 shadow-[0_2px_14px_rgba(0,0,0,0.15)]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(to bottom, transparent, transparent 35px, #E4D8BC 36px)",
-          backgroundPositionY: "110px",
-        }}
-      >
-        <header className="mb-8 border-b-2 border-dashed border-[#C9B98C] pb-4 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8A7A56]">
-            Personal
+    <main className="min-h-screen bg-[#14161B] px-4 py-12">
+      <div className="mx-auto max-w-2xl">
+        <header className="mb-10 border-b border-[#2C3038] pb-5">
+          <p
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            className="text-xs uppercase tracking-[0.2em] text-[#5F6672]"
+          >
+            Personal · {entries.length}{" "}
+            {entries.length === 1 ? "entry" : "entries"}
           </p>
           <h1
-            style={{ fontFamily: "'Caveat', cursive" }}
-            className="text-5xl font-bold text-black"
+            style={{ fontFamily: "'Fraunces', serif" }}
+            className="mt-1 text-3xl font-semibold text-[#ECEDF0]"
           >
-            My Diary
+            Diary
           </h1>
         </header>
 
-        <div className="mb-10">
+        <div className="mb-8">
           <DiaryEntryForm userId={userId} onCreated={refetch} />
         </div>
 

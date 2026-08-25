@@ -7,36 +7,41 @@ interface DiaryEntryCardProps {
 
 export const DiaryEntryCard = ({ entry, onDelete }: DiaryEntryCardProps) => {
   return (
-    <article className="relative rounded-sm border border-[#D8C9A8] bg-[#FFFDF7] p-6 pl-8 shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition hover:shadow-[0_4px_14px_rgba(0,0,0,0.12)]">
-      <span className="absolute -top-2 left-6 h-4 w-14 -rotate-3 bg-[#C9DCE0]/70" />
-      <span className="absolute bottom-5 left-4 top-5 w-px bg-[#D98A93]" />
+    <article className="group relative rounded-md border border-[#2C3038] bg-[#1C1F26] p-6 pl-7 transition hover:border-[#3A3F4A]">
+      <span className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#6E8CA0]/60 transition group-hover:bg-[#6E8CA0]" />
 
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <h2
-          style={{ fontFamily: "'Caveat', cursive" }}
-          className="text-2xl font-bold text-[#2B2B3D]"
-        >
-          {entry.title}
-        </h2>
+      <div className="mb-3 flex items-start justify-between gap-4">
+        <div>
+          <h2
+            style={{ fontFamily: "'Fraunces', serif" }}
+            className="text-xl font-semibold leading-snug text-[#ECEDF0]"
+          >
+            {entry.title}
+          </h2>
+          <time
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            className="mt-1 block text-xs uppercase tracking-wider text-[#5F6672]"
+          >
+            {new Date(entry.createdAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })}
+          </time>
+        </div>
+
         <button
           onClick={() => onDelete(entry.id)}
           aria-label="Delete entry"
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#B5495B]/40 text-xs text-[#B5495B] transition hover:bg-[#B5495B] hover:text-white"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#2C3038] text-sm text-[#9199A6] opacity-0 transition hover:border-[#C97880]/50 hover:text-[#C97880] group-hover:opacity-100 focus:opacity-100"
         >
           ×
         </button>
       </div>
 
-      <p className="whitespace-pre-wrap font-serif text-[15px] leading-8 text-[#3A3A4D]">
+      <p className="whitespace-pre-wrap text-[15px] leading-7 text-[#B7BCC6]">
         {entry.content}
       </p>
-
-      <small
-        style={{ fontFamily: "'Caveat', cursive" }}
-        className="mt-3 block text-right text-lg italic text-[#B3A688]"
-      >
-        {new Date(entry.createdAt).toLocaleDateString()}
-      </small>
     </article>
   );
 };

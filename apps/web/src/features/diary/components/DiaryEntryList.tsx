@@ -9,17 +9,16 @@ interface DiaryEntryListProps {
 export const DiaryEntryList = ({ entries, onDelete }: DiaryEntryListProps) => {
   if (entries.length === 0) {
     return (
-      <p
-        style={{ fontFamily: "'Caveat', cursive" }}
-        className="py-12 text-center text-2xl text-[#B3A688]"
-      >
-        This page is empty. Start writing above.
-      </p>
+      <div className="rounded-md border border-dashed border-[#2C3038] py-14 text-center">
+        <p className="text-sm text-[#5F6672]">
+          No entries yet — write your first one above.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {entries.map((entry) => (
         <DiaryEntryCard key={entry.id} entry={entry} onDelete={onDelete} />
       ))}

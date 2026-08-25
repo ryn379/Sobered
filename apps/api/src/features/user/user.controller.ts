@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { userFindService } from "./user.service.js";
 
-export const Userhome = async (req: Request, res: Response) => {
+export const userhome = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 

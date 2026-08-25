@@ -65,30 +65,30 @@ export const HobbyForm = ({ userId, onCreated }: HobbyFormProps) => {
   };
 
   if (loading) {
-    return <p className="text-[#6B6375]">Loading hobbies...</p>;
+    return <p className="text-[#9199A6]">Loading hobbies...</p>;
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-sm border border-[#C9B98C] bg-[#FBF6E9] p-6"
+      className="rounded-md border border-[#2C3038] bg-[#1C1F26] p-6"
     >
       <h2
-        style={{ fontFamily: "'Caveat', cursive" }}
-        className="text-3xl font-bold text-[#08060D]"
+        style={{ fontFamily: "'Fraunces', serif" }}
+        className="text-2xl font-semibold text-[#ECEDF0]"
       >
         Add a hobby
       </h2>
 
       <div className="mt-5">
-        <label className="mb-2 block text-sm font-medium text-[#6B6375]">
+        <label className="mb-2 block text-sm font-medium text-[#9199A6]">
           Hobby
         </label>
 
         <select
           value={hobbyTypeId}
           onChange={(event) => setHobbyTypeId(event.target.value)}
-          className="w-full rounded-md border border-[#C9B98C] bg-[#FFFDF5] px-4 py-3 text-[#08060D] outline-none focus:border-[#8A7A56]"
+          className="w-full rounded-md border border-[#2C3038] bg-[#14161B] px-4 py-3 text-[#ECEDF0] outline-none focus:border-[#6E8CA0]"
         >
           <option value="">Choose a hobby</option>
 
@@ -101,7 +101,7 @@ export const HobbyForm = ({ userId, onCreated }: HobbyFormProps) => {
       </div>
 
       <div className="mt-5">
-        <label className="mb-2 block text-sm font-medium text-[#6B6375]">
+        <label className="mb-2 block text-sm font-medium text-[#9199A6]">
           Goal
         </label>
 
@@ -110,16 +110,16 @@ export const HobbyForm = ({ userId, onCreated }: HobbyFormProps) => {
           value={goal}
           onChange={(event) => setGoal(event.target.value)}
           placeholder="What do you want to achieve?"
-          className="w-full rounded-md border border-[#C9B98C] bg-[#FFFDF5] px-4 py-3 text-[#08060D] outline-none focus:border-[#8A7A56]"
+          className="w-full rounded-md border border-[#2C3038] bg-[#14161B] px-4 py-3 text-[#ECEDF0] placeholder:text-[#5F6672] outline-none focus:border-[#6E8CA0]"
         />
       </div>
 
-      {error && <p className="mt-4 text-sm text-[#B5495B]">{error}</p>}
+      {error && <p className="mt-4 text-sm text-[#C97880]">{error}</p>}
 
       <button
         type="submit"
         disabled={submitting}
-        className="mt-5 rounded-md bg-[#8A7A56] px-5 py-3 text-white disabled:opacity-50"
+        className="mt-5 rounded-md bg-[#6E8CA0] px-5 py-3 font-medium text-[#14161B] transition hover:bg-[#89A8BC] disabled:opacity-50"
       >
         {submitting ? "Adding..." : "Add Hobby"}
       </button>

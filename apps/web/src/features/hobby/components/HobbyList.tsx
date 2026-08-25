@@ -10,15 +10,15 @@ interface HobbyListProps {
 export const HobbyList = ({ hobbies, onDelete, onSelect }: HobbyListProps) => {
   if (hobbies.length === 0) {
     return (
-      <div className="rounded-sm border border-dashed border-[#C9B98C] p-10 text-center">
+      <div className="rounded-md border border-dashed border-[#2C3038] p-10 text-center">
         <p
-          style={{ fontFamily: "'Caveat', cursive" }}
-          className="text-2xl text-[#6B6375]"
+          style={{ fontFamily: "'Fraunces', serif" }}
+          className="text-xl font-semibold text-[#ECEDF0]"
         >
           No hobbies yet.
         </p>
 
-        <p className="mt-2 text-sm text-[#6B6375]">
+        <p className="mt-2 text-sm text-[#9199A6]">
           Choose something you'd like to work on.
         </p>
       </div>
