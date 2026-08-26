@@ -6,7 +6,8 @@ interface UserSummaryProps {
 }
 
 export const UserSummaryComponent = ({ user, note }: UserSummaryProps) => {
-  const initial = user.username?.charAt(0).toUpperCase();
+  const displayUsername = user.username?.split("_")[0];
+  const initial = displayUsername?.charAt(0).toUpperCase();
 
   return (
     <div className="flex items-start gap-4">
@@ -21,7 +22,7 @@ export const UserSummaryComponent = ({ user, note }: UserSummaryProps) => {
           style={{ fontFamily: "'Fraunces', serif" }}
           className="text-3xl font-semibold leading-tight text-[#E8EBF0]"
         >
-          {user.username}
+          {displayUsername}
         </h2>
 
         <p className="mt-2 max-w-md text-sm leading-6 text-[#9199A6]">{note}</p>

@@ -7,7 +7,7 @@ interface NavbarProps {
 const navItems = [
   {
     label: "Home",
-    path: "/home",
+    path: "/",
   },
   {
     label: "Diary",
@@ -24,6 +24,10 @@ const navItems = [
   {
     label: "Groups",
     path: "/groups",
+  },
+  {
+    label: "Friends",
+    path: "/friend",
   },
 ];
 

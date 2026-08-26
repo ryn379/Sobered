@@ -8,7 +8,7 @@ interface DiaryEntryCardProps {
 export const DiaryEntryCard = ({ entry, onDelete }: DiaryEntryCardProps) => {
   return (
     <article className="group relative rounded-md border border-[#2C3038] bg-[#1C1F26] p-6 pl-7 transition hover:border-[#3A3F4A]">
-      <span className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#6E8CA0]/60 transition group-hover:bg-[#6E8CA0]" />
+      <span className="absolute left-0 top-0 h-full w-0.75 rounded-l-md bg-[#6E8CA0]/60 transition group-hover:bg-[#6E8CA0]" />
 
       <div className="mb-3 flex items-start justify-between gap-4">
         <div>

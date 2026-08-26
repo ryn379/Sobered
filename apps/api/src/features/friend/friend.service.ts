@@ -1,5 +1,5 @@
-import { type Friend, type FriendRequest, friendships } from "./friend.mock.js";
-import { type User, users } from "../user/user.mock.js";
+import { type Friend, type FriendRequest } from "./friend.mock.js";
+import { type User } from "../user/user.mock.js";
 import {
   acceptFriendRequestByUserId,
   addFriendship,
@@ -7,6 +7,7 @@ import {
   deleteFriendByUserId,
   getFriendAllByUserId,
   getFriendRequestsByUserId,
+  getSentFriendRequestsByUserId,
   getUsersFromFriendRequests,
   getUsersFromFriendships,
   postRequestFromUserId,
@@ -35,7 +36,9 @@ export const postFriendRequestService = async (
   userId: string,
   recipientId: string,
 ): Promise<FriendRequest | null> => {
-  if (userId === recipientId) return null;
+  if (userId === recipientId) {
+    return null;
+  }
 
   const user = await findUserByUserId(userId);
   const recipient = await findUserByUserId(recipientId);
@@ -44,43 +47,45 @@ export const postFriendRequestService = async (
     console.log("User or Recipient Does not Exist");
     return null;
   }
+
   if (user.role !== recipient.role) {
     console.log("Different Roles");
     return null;
   }
 
-  const friends = await getFriendAllByUserId(userId);
+  const friendships = await getFriendAllByUserId(userId);
 
-  const alreadyFriends = friends.find(
-    (e) =>
-      (e.friendId === userId && e.userId === recipientId) ||
-      (e.userId === userId && e.friendId === recipientId),
+  const alreadyFriends = friendships.some(
+    (friendship) =>
+      (friendship.userId === userId && friendship.friendId === recipientId) ||
+      (friendship.userId === recipientId && friendship.friendId === userId),
   );
 
   if (alreadyFriends) {
-    console.log("already Friends");
+    console.log("Already Friends");
     return null;
   }
 
-  const requestsRecipient = await getFriendRequestsByUserId(recipientId);
-  const requestsUser = await getFriendRequestsByUserId(userId);
+  const incomingRequests = await getFriendRequestsByUserId(userId);
 
-  const alreadySentRequest = requestsRecipient.find(
-    (e) => e.recipientId === recipientId && e.requesterId === userId,
+  const outgoingRequests = await getSentFriendRequestsByUserId(userId);
+
+  const alreadyIncomingRequest = incomingRequests.some(
+    (request) =>
+      request.requesterId === recipientId && request.recipientId === userId,
   );
 
-  const alreadyIncomingRequest = requestsUser.find(
-    (e) => e.recipientId === userId && e.requesterId === recipientId,
+  const alreadyOutgoingRequest = outgoingRequests.some(
+    (request) =>
+      request.requesterId === userId && request.recipientId === recipientId,
   );
 
-  if (alreadySentRequest || alreadyIncomingRequest) {
-    console.log("Already Incoming or Outgoing Requests");
+  if (alreadyIncomingRequest || alreadyOutgoingRequest) {
+    console.log("Already Incoming or Outgoing Request");
     return null;
   }
 
-  const request = await postRequestFromUserId(userId, recipientId);
-
-  return request;
+  return postRequestFromUserId(userId, recipientId);
 };
 
 export const deleteFriendService = async (
@@ -187,4 +192,78 @@ export const declineFriendService = async (
   }
 
   return request;
+};
+
+export const getSuggestionFriendsService = async (
+  userId: string,
+): Promise<User[]> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    return [];
+  }
+
+  const directFriendships = await getFriendAllByUserId(userId);
+
+  const directFriendIds = directFriendships.map((f) =>
+    f.userId === userId ? f.friendId : f.userId,
+  );
+
+  // sent friend requests
+  const sentRequests = await getSentFriendRequestsByUserId(userId);
+
+  const sentRequestIds = sentRequests.map((request) => request.recipientId);
+
+  // received friend requests
+  const receivedRequests = await getFriendRequestsByUserId(userId);
+
+  const receivedRequestIds = receivedRequests.map(
+    (request) => request.requesterId,
+  );
+
+  // friends of friends
+  const secondFriends = await Promise.all(
+    directFriendIds.map(async (directFriendId) => {
+      const edges = await getFriendAllByUserId(directFriendId);
+
+      return {
+        directFriendId,
+        edges,
+      };
+    }),
+  );
+
+  const suggestionIds = new Set<string>();
+
+  secondFriends.forEach(({ directFriendId, edges }) => {
+    edges.forEach((edge) => {
+      let candidateId: string | null = null;
+
+      if (edge.userId === directFriendId) {
+        candidateId = edge.friendId;
+      } else if (edge.friendId === directFriendId) {
+        candidateId = edge.userId;
+      }
+
+      if (!candidateId) return;
+
+      if (candidateId === userId) return; // remove the user
+
+      if (directFriendIds.includes(candidateId)) return; // remove already friends
+
+      if (sentRequestIds.includes(candidateId)) return; // remove outgoing friend requests
+
+      if (receivedRequestIds.includes(candidateId)) return; // remove incoming requests
+
+      suggestionIds.add(candidateId);
+    });
+  });
+
+  const suggestions = await Promise.all(
+    Array.from(suggestionIds).map((candidateId) =>
+      findUserByUserId(candidateId),
+    ),
+  );
+
+  return suggestions.filter((entry): entry is User => entry !== null);
 };

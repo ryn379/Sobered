@@ -148,3 +148,11 @@ export const declineFriendRequestByUserId = async (
 
   return request;
 };
+
+export const getSentFriendRequestsByUserId = async (
+  userId: string,
+): Promise<FriendRequest[]> => {
+  return friendRequests.filter(
+    (e) => e.requesterId === userId && e.status === "PENDING",
+  );
+};

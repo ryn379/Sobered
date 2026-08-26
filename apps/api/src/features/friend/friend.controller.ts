@@ -6,6 +6,7 @@ import {
   deleteFriendService,
   acceptFriendService,
   declineFriendService,
+  getSuggestionFriendsService,
 } from "./friend.service.js";
 
 export const getFriends = async (req: Request, res: Response) => {
@@ -183,8 +184,7 @@ export const declineRequestFriends = async (req: Request, res: Response) => {
 
 export const deleteFriend = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const { friendId } = req.body;
+    const { userId, friendId } = req.params;
 
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
@@ -210,6 +210,34 @@ export const deleteFriend = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       data: entry,
+    });
+  } catch (err: any) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getSuggestionFriends = async (req: Request, res: Response) => {
+  try {
+    console.log("this is getSuggestionFriends");
+
+    const { userId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const suggestions = await getSuggestionFriendsService(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: suggestions,
     });
   } catch (err: any) {
     console.log(err.message);
