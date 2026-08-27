@@ -5,12 +5,10 @@ import { HobbyAnalysis } from "../components/HobbyAnalysis";
 // import { useHobby } from "../hooks/useHobbies";
 import { useHobbyAnalysis } from "../hooks/useHobbyAnalysis";
 
-export const HobbyDetailPage = () => {
+export const HobbyDetailPage = ({ userId }: { userId: string }) => {
   const { hobbyId } = useParams<{
     hobbyId: string;
   }>();
-
-  const userId = "user_001";
 
   // const { getHobby } = useHobby(userId);
 

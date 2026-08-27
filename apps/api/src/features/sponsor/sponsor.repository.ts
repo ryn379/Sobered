@@ -6,6 +6,7 @@ import {
 } from "./sponsor.mock.js";
 
 import { type User, users } from "../user/user.mock.js";
+import { findUserByUserId } from "../user/user.repository.js";
 
 export const getSponsorByUserId = async (
   userId: string,
@@ -49,7 +50,7 @@ export const getSponsorReqsAllByUserId = async (
 export const addSponsorRequestByUserId = async (
   userId: string,
   recipientId: string,
-): Promise<SponsorRequest | null> => {
+): Promise<SponsorRequest> => {
   const request: SponsorRequest = {
     id: `request_${String(sponsorRequests.length + 1).padStart(3, "0")}`,
     requesterId: userId,
@@ -83,6 +84,7 @@ export const declineSponsorRequestByReqId = async (
   const entry = sponsorRequests.find((e) => e.id === reqId);
 
   if (!entry) {
+    console.log("Request not found");
     return null;
   }
 
@@ -108,10 +110,13 @@ export const addSponsorRelationship = async (
   return relationship;
 };
 
-export const getSponsorRequestByReqId = async (
-  reqId: string,
+export const getSponsorRequestByUserId = async (
+  userId: string,
+  requesterId: string,
 ): Promise<SponsorRequest | null> => {
-  const request = sponsorRequests.find((e) => e.id === reqId);
+  const request = sponsorRequests.find(
+    (e) => e.requesterId === requesterId && e.recipientId === userId,
+  );
 
   return request ?? null;
 };
@@ -128,4 +133,36 @@ export const getPendingSponsorRequest = async (
   );
 
   return request ?? null;
+};
+
+export const getRandomUsers = async (userId: string): Promise<User[]> => {
+  const availUsers = users.filter((e) => e.id !== userId);
+
+  for (let i = availUsers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [availUsers[i], availUsers[j]] = [availUsers[j]!, availUsers[i]!];
+  }
+
+  return availUsers.slice(0, 10);
+};
+
+export const getOutgoingSponsorRequestsByUserId = async (
+  userId: string,
+): Promise<User[]> => {
+  const requests = sponsorRequests.filter(
+    (e) => e.requesterId === userId && e.status === "pending",
+  );
+
+  const requestUsers = (
+    await Promise.all(
+      requests.map(async (e) => {
+        const user = await findUserByUserId(e.recipientId);
+
+        return user;
+      }),
+    )
+  ).filter((user) => user !== null);
+
+  return requestUsers;
 };

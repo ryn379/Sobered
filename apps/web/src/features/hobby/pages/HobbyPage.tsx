@@ -4,9 +4,7 @@ import { HobbyForm } from "../components/HobbyForm";
 import { HobbyList } from "../components/HobbyList";
 import { useHobby } from "../hooks/useHobbies";
 
-export const HobbyPage = () => {
-  const userId = "user_001";
-
+export const HobbyPage = ({ userId }: { userId: string }) => {
   const navigate = useNavigate();
 
   const { entries, loading, error, removeHobby, refetch } = useHobby(userId);

@@ -2,9 +2,7 @@ import { DiaryEntryForm } from "../components/DiaryEntryForm";
 import { DiaryEntryList } from "../components/DiaryEntryList";
 import { useDiary } from "../hooks/useDiary";
 
-export const DiaryPage = () => {
-  const userId = "user_001";
-
+export const DiaryPage = ({ userId }: { userId: string }) => {
   const { entries, loading, error, deleteEntry, refetch } = useDiary(userId);
 
   if (loading) {

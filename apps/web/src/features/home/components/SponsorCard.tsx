@@ -11,6 +11,14 @@ export const SponsorCard = ({
   availability,
   phone,
 }: SponsorCardProps) => {
+  if (!sponsor || !sponsor.username) {
+    return (
+      <div className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-6">
+        <p className="text-[#E8EBF0]">No Sponsor</p>
+      </div>
+    );
+  }
+  console.log(sponsor);
   const initial = sponsor.username.charAt(0).toUpperCase();
 
   return (
