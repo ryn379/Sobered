@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
-import { getFamilyService, SobrietyFamilyService } from "./family.service.js";
+import {
+  getFamilyService,
+  getRecovererFromFamilyService,
+  SobrietyFamilyService,
+} from "./family.service.js";
 
 export const getFamily = async (req: Request, res: Response) => {
   try {
@@ -45,7 +49,7 @@ export const getRecovererFromFamily = async (req: Request, res: Response) => {
       });
     }
 
-    const recoverer = await getFamilyService(userId);
+    const recoverer = await getRecovererFromFamilyService(userId);
 
     if (!recoverer) {
       return res.status(400).json({

@@ -90,10 +90,17 @@ export const useSponsor = (userId: string) => {
     try {
       setError(null);
 
-      await postReqSponsor(userId, recepientId);
+      const request = await postReqSponsor(userId, recepientId);
+
+      setSuggestions((prev) =>
+        prev.filter((e) => e.id !== request.recipientId),
+      );
+
+      if (request) return true;
     } catch (err) {
       console.log(err);
       setError("Failed to sent sponsor request");
+      return false;
     }
   };
 

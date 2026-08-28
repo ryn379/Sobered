@@ -33,6 +33,10 @@ const navItems = [
     label: "Friends",
     path: "/friend",
   },
+  {
+    label: "Family",
+    path: "/family",
+  },
 ];
 
 export const Navbar = ({ username }: NavbarProps) => {

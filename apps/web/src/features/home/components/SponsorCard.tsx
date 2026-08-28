@@ -1,7 +1,7 @@
 import type { User } from "../types";
 
 interface SponsorCardProps {
-  sponsor: User;
+  sponsor: User | User[];
   availability?: string;
   phone?: string;
 }
@@ -11,7 +11,7 @@ export const SponsorCard = ({
   availability,
   phone,
 }: SponsorCardProps) => {
-  if (!sponsor || !sponsor.username) {
+  if (Array.isArray(sponsor)) {
     return (
       <div className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-6">
         <p className="text-[#E8EBF0]">No Sponsor</p>

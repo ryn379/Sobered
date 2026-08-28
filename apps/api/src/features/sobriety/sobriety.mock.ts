@@ -47,15 +47,6 @@ export const sobrietyRecords: Sobriety[] = [
   },
   {
     id: "sobriety_003",
-    userId: "user_003",
-    startDate: "2026-07-15",
-    longestStreak: 42,
-    totalMeetings: 9,
-    createdAt: "2026-07-15T09:30:00.000Z",
-    updatedAt: "2026-08-15T08:30:00.000Z",
-  },
-  {
-    id: "sobriety_004",
     userId: "user_004",
     startDate: "2026-06-15",
     longestStreak: 61,
@@ -64,7 +55,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T07:30:00.000Z",
   },
   {
-    id: "sobriety_005",
+    id: "sobriety_004",
     userId: "user_005",
     startDate: "2026-07-12",
     longestStreak: 39,
@@ -73,16 +64,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T09:00:00.000Z",
   },
   {
-    id: "sobriety_006",
-    userId: "user_006",
-    startDate: "2026-08-05",
-    longestStreak: 10,
-    totalMeetings: 3,
-    createdAt: "2026-08-05T12:00:00.000Z",
-    updatedAt: "2026-08-15T10:00:00.000Z",
-  },
-  {
-    id: "sobriety_007",
+    id: "sobriety_005",
     userId: "user_007",
     startDate: "2026-05-20",
     longestStreak: 88,
@@ -91,7 +73,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T07:00:00.000Z",
   },
   {
-    id: "sobriety_008",
+    id: "sobriety_006",
     userId: "user_008",
     startDate: "2026-07-25",
     longestStreak: 25,
@@ -100,7 +82,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T08:15:00.000Z",
   },
   {
-    id: "sobriety_009",
+    id: "sobriety_007",
     userId: "user_009",
     startDate: "2026-06-01",
     longestStreak: 76,
@@ -109,16 +91,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T07:45:00.000Z",
   },
   {
-    id: "sobriety_010",
-    userId: "user_010",
-    startDate: "2026-08-10",
-    longestStreak: 7,
-    totalMeetings: 2,
-    createdAt: "2026-08-10T09:00:00.000Z",
-    updatedAt: "2026-08-15T09:30:00.000Z",
-  },
-  {
-    id: "sobriety_011",
+    id: "sobriety_008",
     userId: "user_011",
     startDate: "2026-04-15",
     longestStreak: 103,
@@ -127,7 +100,7 @@ export const sobrietyRecords: Sobriety[] = [
     updatedAt: "2026-08-15T06:45:00.000Z",
   },
   {
-    id: "sobriety_012",
+    id: "sobriety_009",
     userId: "user_012",
     startDate: "2026-07-05",
     longestStreak: 51,
@@ -164,14 +137,6 @@ export const sobrietyHistory: SobrietyHistory[] = [
   },
   {
     id: "history_004",
-    userId: "user_003",
-    startDate: "2026-05-01",
-    endDate: "2026-06-10",
-    durationDays: 40,
-    createdAt: "2026-06-10T10:00:00.000Z",
-  },
-  {
-    id: "history_005",
     userId: "user_004",
     startDate: "2026-03-01",
     endDate: "2026-04-15",
@@ -179,7 +144,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-04-15T10:00:00.000Z",
   },
   {
-    id: "history_006",
+    id: "history_005",
     userId: "user_005",
     startDate: "2026-05-10",
     endDate: "2026-06-15",
@@ -187,15 +152,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-06-15T10:00:00.000Z",
   },
   {
-    id: "history_007",
-    userId: "user_006",
-    startDate: "2026-07-01",
-    endDate: "2026-07-20",
-    durationDays: 19,
-    createdAt: "2026-07-20T10:00:00.000Z",
-  },
-  {
-    id: "history_008",
+    id: "history_006",
     userId: "user_007",
     startDate: "2026-02-01",
     endDate: "2026-04-20",
@@ -203,7 +160,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-04-20T10:00:00.000Z",
   },
   {
-    id: "history_009",
+    id: "history_007",
     userId: "user_008",
     startDate: "2026-06-01",
     endDate: "2026-06-28",
@@ -211,7 +168,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-06-28T10:00:00.000Z",
   },
   {
-    id: "history_010",
+    id: "history_008",
     userId: "user_009",
     startDate: "2026-02-15",
     endDate: "2026-04-30",
@@ -219,15 +176,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-04-30T10:00:00.000Z",
   },
   {
-    id: "history_011",
-    userId: "user_010",
-    startDate: "2026-07-01",
-    endDate: "2026-07-18",
-    durationDays: 17,
-    createdAt: "2026-07-18T10:00:00.000Z",
-  },
-  {
-    id: "history_012",
+    id: "history_009",
     userId: "user_011",
     startDate: "2026-01-05",
     endDate: "2026-03-20",
@@ -235,7 +184,7 @@ export const sobrietyHistory: SobrietyHistory[] = [
     createdAt: "2026-03-20T10:00:00.000Z",
   },
   {
-    id: "history_013",
+    id: "history_010",
     userId: "user_012",
     startDate: "2026-05-15",
     endDate: "2026-06-25",

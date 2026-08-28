@@ -66,8 +66,7 @@ export const SponsorPage = ({ userId }: { userId: string }) => {
               {sponsor ? (
                 <SponsorCard
                   sponsor={sponsor}
-                  availability="weekdays, 8am–8pm"
-                  phone={sponsor.phone}
+                  availability="weekdays, 8am-8pm"
                 />
               ) : (
                 <div className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-10 text-center">
