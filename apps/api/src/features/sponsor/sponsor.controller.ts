@@ -7,7 +7,7 @@ import {
   getReqsService,
   getSponsorService,
   getSuggestionsSponsorService,
-  postReqServiece,
+  postReqService,
 } from "./sponsor.service.js";
 
 export const getSponsor = async (req: Request, res: Response) => {
@@ -182,7 +182,7 @@ export const postReqSponsor = async (req: Request, res: Response) => {
       });
     }
 
-    const entry = await postReqServiece(userId, recipientId);
+    const entry = await postReqService(userId, recipientId);
 
     if (!entry) {
       return res.status(400).json({

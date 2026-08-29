@@ -37,19 +37,25 @@ export const getSponsorService = async (
 };
 
 export const getReqsService = async (userId: string): Promise<User[]> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    return Array<User>();
+  }
+
   const entries = await getSponsorReqsAllByUserId(userId);
 
   return entries;
 };
 
-export const postReqServiece = async (
+export const postReqService = async (
   userId: string,
   recipientId: string,
 ): Promise<SponsorRequest | null> => {
   if (userId === recipientId) return null;
 
-  const sponsor = await getSponsorByUserId(userId);
   const requester = await findUserByUserId(userId);
+  const sponsor = await getSponsorByUserId(userId);
   const recipient = await findUserByUserId(recipientId);
 
   if (!requester || !recipient) {
