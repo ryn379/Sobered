@@ -265,7 +265,7 @@ export const updateProgressHobby = async (req: Request, res: Response) => {
     if (!note || typeof note !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Invalid User ID",
+        message: "Invalid Note",
       });
     }
 

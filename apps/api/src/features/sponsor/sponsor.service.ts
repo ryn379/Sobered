@@ -167,7 +167,13 @@ export const getMenteeService = async (userId: string): Promise<User[]> => {
 
 export const getSuggestionsSponsorService = async (
   userId: string,
-): Promise<User[]> => {
+): Promise<User[] | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) {
+    return null;
+  }
+
   const users = await getRandomUsers(userId);
 
   const requests = await getOutgoingSponsorRequestsByUserId(userId);

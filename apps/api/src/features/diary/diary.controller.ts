@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 
 import {
-  deleteDiarySerive,
+  deleteDiaryService,
   getDiaryEntriesService,
   getDiaryEntryService,
   postDiaryService,
@@ -23,7 +23,7 @@ export const getDiary = async (req: Request, res: Response) => {
     const entries = await getDiaryEntriesService(userId);
 
     if (!entries) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "No Diary Entry Found",
       });
@@ -69,7 +69,13 @@ export const entryDiary = async (req: Request, res: Response) => {
     }
 
     const entry = await postDiaryService(userId, title, content, mood);
-    console.log(entry);
+
+    if (!entry) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -190,7 +196,7 @@ export const deleteEntryDiary = async (req: Request, res: Response) => {
       });
     }
 
-    const deletedEntry = await deleteDiarySerive(userId, entryId);
+    const deletedEntry = await deleteDiaryService(userId, entryId);
 
     if (!deletedEntry) {
       return res.status(404).json({

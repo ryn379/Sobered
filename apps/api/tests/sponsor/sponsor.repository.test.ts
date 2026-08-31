@@ -45,7 +45,15 @@ describe("getSponsorReqsAllByUserId", async () => {
   it("returns user array of all incoming sponsor requests", async () => {
     const result = await getSponsorReqsAllByUserId("user_001");
 
-    expect(result).toEqual([]);
+    expect(result).toEqual([
+      {
+        createdAt: "2026-07-26T12:00:00.000Z",
+        email: "olivia@example.com",
+        id: "user_015",
+        role: "RECOVERING_USER",
+        username: "olivia_recovery",
+      },
+    ]);
   });
 });
 

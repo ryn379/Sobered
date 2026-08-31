@@ -1,10 +1,5 @@
 import { findUserByUserId } from "../user/user.repository.js";
-import {
-  hobbies,
-  predefinedHobbies,
-  type Hobby,
-  type PredefinedHobby,
-} from "./hobby.mock.js";
+import { type Hobby, type PredefinedHobby } from "./hobby.mock.js";
 import {
   createHobby,
   createHobbyProgress,

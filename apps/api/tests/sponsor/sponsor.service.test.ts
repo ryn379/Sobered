@@ -686,6 +686,7 @@ describe("getSuggestionsSponsorService", () => {
     ];
 
     const requests: User[] = [users[1]];
+    vi.mocked(findUserByUserId).mockResolvedValueOnce(users[0]);
 
     vi.mocked(getRandomUsers).mockResolvedValueOnce(users);
 

@@ -10,8 +10,12 @@ import {
 
 export const getDiaryEntriesService = async (
   userId: string,
-): Promise<DiaryEntry[]> => {
+): Promise<DiaryEntry[] | null> => {
   console.log("this is in diary.service");
+
+  const user = await findUserByUserId(userId);
+
+  if (!user) return null;
 
   const entries = await findDiaryEntryByUserId(userId);
 
@@ -72,7 +76,7 @@ export const updateDiaryService = async (
   return entry;
 };
 
-export const deleteDiarySerive = async (
+export const deleteDiaryService = async (
   userId: string,
   entryId: string,
 ): Promise<DiaryEntry | null> => {
@@ -107,8 +111,12 @@ export const postDiaryService = async (
   title: string,
   content: string,
   mood?: string,
-): Promise<DiaryEntry> => {
+): Promise<DiaryEntry | null> => {
   console.log("this is in diary.service");
+
+  const user = await findUserByUserId(userId);
+
+  if (!user) return null;
 
   const entry = await postDiaryEntry(userId, title, content, mood);
 
