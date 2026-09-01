@@ -5,6 +5,7 @@ import {
   closeEmergencyRequestByReqId,
   escalateEmergencyRequestByReqId,
   getAcceptedEmergencyByUserId,
+  getActiveEmergencyByUserId,
   getAllOpenEmergencyRequests,
   getEmergencyRequestByReqId,
   postEmergencyRequestByUserId,
@@ -105,16 +106,31 @@ export const acceptEmergencyRequestService = async (
     console.log("request does not exist");
     return null;
   }
+
   if (request.userId === userId) {
     console.log("User cannot accept their own request");
     return null;
   }
-  const existingAccepted = await getAcceptedEmergencyByUserId(userId);
 
-  if (existingAccepted) {
-    console.log("User has already accepted one emergency");
+  if (request.status !== "OPEN" && request.status !== "ESCALATED") {
+    console.log("Emergency is not available");
     return null;
   }
+
+  const existingEmergency = await getActiveEmergencyByUserId(userId);
+
+  if (existingEmergency) {
+    console.log("User is already involved in an emergency");
+    return null;
+  }
+
+  const requesterEmergency = await getActiveEmergencyByUserId(request.userId);
+
+  if (requesterEmergency) {
+    console.log("Requester is already involved in another emergency");
+    return null;
+  }
+
   return await acceptEmergencyRequestByReqId(userId, reqId);
 };
 

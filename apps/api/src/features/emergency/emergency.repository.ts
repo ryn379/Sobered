@@ -83,3 +83,17 @@ export const closeEmergencyRequestByReqId = async (
 
   return null;
 };
+
+export const getActiveEmergencyByUserId = async (
+  userId: string,
+): Promise<EmergencyRequest | null> => {
+  const request = emergencyRequests.find(
+    (e) =>
+      (e.userId === userId || e.acceptedBy === userId) &&
+      (e.status === "OPEN" ||
+        e.status === "ACCEPTED" ||
+        e.status === "ESCALATED"),
+  );
+
+  return request ?? null;
+};

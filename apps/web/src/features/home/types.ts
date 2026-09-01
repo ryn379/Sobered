@@ -44,3 +44,20 @@ export interface SobrietySummary {
   longestStreak: number;
   totalDays: number;
 }
+
+export type EmergencyType =
+  | "CRAVING"
+  | "EMOTIONAL_SUPPORT"
+  | "PROFESSIONAL_HELP";
+
+export type EmergencyStatus = "OPEN" | "ACCEPTED" | "CLOSED" | "ESCALATED";
+
+export interface EmergencyRequest {
+  id: string;
+  userId: string;
+  type: EmergencyType;
+  status: EmergencyStatus;
+  acceptedBy?: string;
+  createdAt: string;
+  closedAt?: string;
+}

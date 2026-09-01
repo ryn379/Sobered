@@ -2,14 +2,11 @@ import { SobrietySummaryComponent } from "../components/SobrietySummary";
 import { UserSummaryComponent } from "../components/UserSummary";
 import { IntentionCard } from "../components/IntentionCard";
 import { SponsorCard } from "../components/SponsorCard";
-// import meetings
-// import group
-// import friends
-// import family
-// import hobby
-
+import { EmergencyButton } from "../components/EmergencyButton";
+import { EmergencyRequests } from "../components/EmergencyRequests";
 import { useSobriety } from "../hooks/useSobriety";
 import { useUserHome } from "../hooks/useUserHome";
+import { useEmergency } from "../hooks/useEmergency";
 
 interface HomePageProps {
   userId: string;
@@ -28,6 +25,24 @@ const HomePage = ({ userId }: HomePageProps) => {
     loading: sobrietyLoading,
     error: sobrietyError,
   } = useSobriety(userId);
+
+  const {
+    emergencies,
+    myEmergency,
+    postRequest,
+    acceptRequest,
+    closeRequest,
+    escalateRequest,
+    refetchEmergencies,
+  } = useEmergency(userId, user?.role ?? "RECOVERING_USER");
+
+  const handleSubmit = async (type: string) => {
+    const response = await postRequest(type);
+
+    refetchEmergencies();
+
+    return response;
+  };
 
   if (userLoading || sobrietyLoading) {
     return (
@@ -56,32 +71,57 @@ const HomePage = ({ userId }: HomePageProps) => {
   return (
     <div className="min-h-screen bg-[#14161B]">
       <main className="mx-auto max-w-6xl px-6 py-10 md:px-10">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <div className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-6 md:p-8">
-              <UserSummaryComponent
-                user={user}
-                note="One day at a time. You're doing this."
-              />
+        {/* Page header: who you are and the one thing that always needs to be one tap away */}
+        <div className="flex flex-col gap-4 border-b border-[#2A2E36] pb-8 sm:flex-row sm:items-start sm:justify-between">
+          <UserSummaryComponent
+            user={user}
+            note="One day at a time. You're doing this."
+          />
+          <EmergencyButton
+            emergency={myEmergency}
+            onSubmit={handleSubmit}
+            onClose={closeRequest}
+          />
+        </div>
 
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {/* Today: the steady, low-stakes overview */}
+            <section className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-6 md:p-8">
+              <h2 className="text-lg font-medium text-[#E8EBF0]">Today</h2>
+
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <SobrietySummaryComponent
                   sobriety={sobriety}
                   nextMilestone={90}
                 />
-
                 <IntentionCard intention="Notice one moment of calm today, and let it be enough." />
               </div>
-            </div>
+            </section>
+
+            {/* Emergency requests: kept in its own container so it reads as
+                a distinct, higher-attention feed rather than another "today" tile */}
+            <section className="rounded-lg border border-[#2A2E36] bg-[#1C1F26] p-6 md:p-8">
+              <EmergencyRequests
+                emergencies={emergencies}
+                myEmergency={myEmergency}
+                role={user.role}
+                onAccept={acceptRequest}
+                onClose={closeRequest}
+                onEscalate={escalateRequest}
+              />
+            </section>
           </div>
 
-          {sponsor && (
-            <SponsorCard
-              sponsor={sponsor}
-              availability="weekdays, 8am–8pm"
-              phone={sponsor.phone}
-            />
-          )}
+          <div className="space-y-6">
+            {sponsor && (
+              <SponsorCard
+                sponsor={sponsor}
+                availability="weekdays, 8am–8pm"
+                phone={sponsor.phone}
+              />
+            )}
+          </div>
         </div>
       </main>
     </div>

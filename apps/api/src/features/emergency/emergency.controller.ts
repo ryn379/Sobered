@@ -52,6 +52,7 @@ export const postEmergencyRequest = async (req: Request, res: Response) => {
     ] as const;
 
     if (!type || !validTypes.includes(type)) {
+      console.log(type);
       return res.status(400).json({
         success: false,
         message: "Invalid Type",

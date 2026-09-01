@@ -11,7 +11,7 @@ import { FamilyPage } from "../features/family/pages/FamilyPage.tsx";
 import type { User } from "../features/home/types.ts";
 
 export const AppRoutes = () => {
-  const userId = "user_006";
+  const userId = "user_001";
   const role: User["role"] = "FAMILY_MEMBER";
   return (
     <Routes>

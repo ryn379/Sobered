@@ -6,11 +6,9 @@ import { userHome } from "../../../services/user.service";
 
 export const useUserHome = (userId: string) => {
   const [user, setUser] = useState<User | null>(null);
-
   const [sponsor, setSponsor] = useState<User | null>(null);
 
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserHome = useCallback(async () => {
