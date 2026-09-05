@@ -13,7 +13,16 @@ import {
 
 export const getGroups = async (req: Request, res: Response) => {
   try {
-    const groups = await getGroupsService();
+    const { userId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const groups = await getGroupsService(userId);
 
     res.status(200).json({
       success: true,
@@ -30,7 +39,7 @@ export const getGroups = async (req: Request, res: Response) => {
 
 export const getGroup = async (req: Request, res: Response) => {
   try {
-    const { groupId } = req.params;
+    const { userId, groupId } = req.params;
 
     if (!groupId || typeof groupId !== "string") {
       return res.status(400).json({
@@ -39,12 +48,19 @@ export const getGroup = async (req: Request, res: Response) => {
       });
     }
 
-    const group = await getGroupService(groupId);
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
+
+    const group = await getGroupService(userId, groupId);
 
     if (!group) {
       return res.status(404).json({
         success: false,
-        message: "Group Not Found",
+        message: "User of Group Not Found",
       });
     }
 
@@ -182,7 +198,14 @@ export const membersGroup = async (req: Request, res: Response) => {
 
 export const leaderGroup = async (req: Request, res: Response) => {
   try {
-    const { groupId } = req.params;
+    const { userId, groupId } = req.params;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid User ID",
+      });
+    }
 
     if (!groupId || typeof groupId !== "string") {
       return res.status(400).json({

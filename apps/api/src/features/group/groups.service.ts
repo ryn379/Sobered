@@ -9,7 +9,7 @@ import {
 import {
   addUserToGroupByGroupId,
   assignLeaderGroupByGroupId,
-  getAllGroups,
+  getAllUserGroups,
   getGroupByGroupId,
   getGroupsByUserId,
   getLeadersByGroupId,
@@ -18,15 +18,26 @@ import {
   removeUserFromGroupByGroupId,
 } from "./group.repository.js";
 
-export const getGroupsService = async (): Promise<Group[]> => {
-  const groups = await getAllGroups();
+export const getGroupsService = async (
+  userId: string,
+): Promise<Group[] | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) return null;
+
+  const groups = await getAllUserGroups(userId);
 
   return groups;
 };
 
 export const getGroupService = async (
+  userId: string,
   groupId: string,
 ): Promise<Group | null> => {
+  const user = await findUserByUserId(userId);
+
+  if (!user) return null;
+
   const group = await getGroupByGroupId(groupId);
 
   return group;
@@ -61,7 +72,7 @@ export const joinGroupService = async (
 export const leaveGroupService = async (
   userId: string,
   groupId: string,
-): Promise<User | null> => {
+): Promise<Group | null> => {
   const user = await findUserByUserId(userId);
 
   const group = await getGroupByGroupId(groupId);
@@ -82,7 +93,7 @@ export const leaveGroupService = async (
 
   await removeUserFromGroupByGroupId(userId, groupId);
 
-  return user;
+  return group;
 };
 
 export const membersGroupService = async (

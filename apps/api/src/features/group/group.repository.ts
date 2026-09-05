@@ -6,8 +6,16 @@ import {
   groupMembers,
 } from "./group.mock.js";
 
-export const getAllGroups = async (): Promise<Group[]> => {
-  return groups;
+export const getAllUserGroups = async (userId: string): Promise<Group[]> => {
+  const userGroupMember = groupMembers.filter((e) => e.userId === userId);
+
+  const userGroups = userGroupMember
+    .map((e) => {
+      return groups.find((f) => f.id === e.groupId);
+    })
+    .filter((group) => group !== undefined);
+
+  return userGroups;
 };
 
 export const getGroupsByUserId = async (userId: string): Promise<Group[]> => {

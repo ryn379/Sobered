@@ -11,6 +11,7 @@ import meetingsRouter from "./features/meeting/meetings.route.js";
 import sobrietyRouter from "./features/sobriety/sobriety.route.js";
 import sponsorRouter from "./features/sponsor/sponsor.route.js";
 import userRouter from "./features/user/user.route.js";
+import chatRouter from "./features/group/chat/groupMessage.route.js";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/meeting", meetingsRouter);
 app.use("/api/sobriety", sobrietyRouter);
 app.use("/api/sponsor", sponsorRouter);
 app.use("/api/user", userRouter);
+app.use("/api/group/chat", chatRouter);
 
 const PORT = process.env.PORT || 8008;
 
