@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
 import type { Hobby } from "../types";
 import {
   createHobby,
@@ -7,119 +6,91 @@ import {
   getUserHobby,
   updateProgressHobby,
 } from "../../../services/hobby.service.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useHobby = (userId: string) => {
-  const [entries, setEntries] = useState<Hobby[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const queryKey = ["hobbies", userId];
 
-  const fetchEntries = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const {
+    data: entries = [],
+    isLoading: loading,
+    error: fetchError,
+    refetch,
+  } = useQuery({
+    queryKey,
+    queryFn: () => getUserHobbies(userId),
+    enabled: !!userId,
+  });
 
-      const data = await getUserHobbies(userId);
+  const getHobby = async (hobbyId: string) => {
+    return getUserHobby(userId, hobbyId);
+  };
 
-      setEntries(data);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch entries");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
-
-  const getHobby = useCallback(
-    async (hobbyId: string) => {
-      try {
-        const userHobby = await getUserHobby(userId, hobbyId);
-
-        return userHobby;
-      } catch (err) {
-        console.log(err);
-        setError("Failed to get Analysis");
-        return null;
-      }
+  const addMutation = useMutation({
+    mutationFn: ({
+      hobbyTypeId,
+      goal,
+    }: {
+      hobbyTypeId: string;
+      goal: string;
+    }) => createHobby(userId, hobbyTypeId, goal),
+    onSuccess: (hobby) => {
+      queryClient.setQueryData<Hobby[]>(queryKey, (prev = []) => [
+        ...prev,
+        hobby,
+      ]);
     },
-    [userId],
-  );
+  });
 
-  const addHobby = async ({
-    hobbyTypeId,
-    goal,
-  }: {
-    hobbyTypeId: string;
-    goal: string;
-  }) => {
-    try {
-      const hobby = await createHobby(userId, hobbyTypeId, goal);
-
-      setEntries((prev) => [...prev, hobby]);
-    } catch (err) {
-      console.log(err);
-      setError("Cannot add this hobby");
-      return null;
-    }
-  };
-
-  const removeHobby = async (hobbyId: string) => {
-    try {
-      setError(null);
-
-      await deleteHobby(userId, hobbyId);
-
-      setEntries((prev) => prev.filter((e) => e.id !== hobbyId));
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete hobby");
-
-      return false;
-    }
-  };
-
-  const updateProgress = async (
-    hobbyId: string,
-    progress: number,
-    note: string,
-  ) => {
-    try {
-      setError(null);
-
-      const updatedHobby = await updateProgressHobby(
-        userId,
-        hobbyId,
-        progress,
-        note,
+  const removeMutation = useMutation({
+    mutationFn: (hobbyId: string) => deleteHobby(userId, hobbyId),
+    onSuccess: (_, hobbyId) => {
+      queryClient.setQueryData<Hobby[]>(queryKey, (prev = []) =>
+        prev.filter((hobby) => hobby.id !== hobbyId),
       );
+    },
+  });
 
-      setEntries((prev) =>
-        prev.map((hobby) => (hobby.id === hobbyId ? updatedHobby : hobby)),
+  const updateMutation = useMutation({
+    mutationFn: ({
+      hobbyId,
+      progress,
+      note,
+    }: {
+      hobbyId: string;
+      progress: number;
+      note: string;
+    }) => updateProgressHobby(userId, hobbyId, progress, note),
+
+    onSuccess: (updatedHobby) => {
+      queryClient.setQueryData<Hobby[]>(queryKey, (prev = []) =>
+        prev.map((hobby) =>
+          hobby.id === updatedHobby.id ? updatedHobby : hobby,
+        ),
       );
-
-      return updatedHobby;
-    } catch (err) {
-      console.error(err);
-
-      setError("Failed to update progress");
-
-      return null;
-    }
-  };
+    },
+  });
 
   return {
     entries,
     loading,
-    error,
-    refetch: fetchEntries,
+    error:
+      fetchError ||
+      addMutation.error ||
+      removeMutation.error ||
+      updateMutation.error,
+
+    refetch,
     getHobby,
-    addHobby,
-    removeHobby,
-    updateProgress,
+
+    addHobby: addMutation.mutateAsync,
+    removeHobby: removeMutation.mutateAsync,
+    updateProgress: (hobbyId: string, progress: number, note: string) =>
+      updateMutation.mutateAsync({ hobbyId, progress, note }),
+
+    adding: addMutation.isPending,
+    removing: removeMutation.isPending,
+    updating: updateMutation.isPending,
   };
 };

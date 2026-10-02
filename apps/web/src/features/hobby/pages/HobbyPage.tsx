@@ -47,7 +47,7 @@ export const HobbyPage = ({ userId }: { userId: string }) => {
 
         {error && (
           <div className="mb-6 rounded-md border border-[#C97880]/30 bg-[#1C1F26] p-4 text-[#C97880]">
-            {error}
+            {error.message}
           </div>
         )}
 

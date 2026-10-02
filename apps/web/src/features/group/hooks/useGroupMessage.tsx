@@ -1,60 +1,45 @@
-import { useCallback, useEffect, useState } from "react";
 import type { GroupMessage } from "../types";
 import {
   getGroupMessages,
   sendGroupMessage,
 } from "../../../services/groupMessage.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGroupMessage = (userId: string, groupId: string) => {
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: messages = [],
+    isLoading: loading,
+    error: fetchError,
+    refetch,
+  } = useQuery({
+    queryKey: ["groupMessages", userId, groupId],
+    queryFn: () => getGroupMessages(userId, groupId),
+    enabled: !!userId && !!groupId,
+  });
 
-  const [messages, setMessages] = useState<GroupMessage[]>([]);
+  const {
+    mutateAsync: sendMessage,
+    isPending: sending,
+    error: sendError,
+  } = useMutation({
+    mutationFn: (content: string) => sendGroupMessage(userId, groupId, content),
 
-  const fetchMessages = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      setError(null);
-
-      const data = await getGroupMessages(userId, groupId);
-
-      setMessages(data);
-    } catch (err) {
-      console.log(err);
-
-      setError("Failed to load messages");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, groupId]);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
-
-  const sendMessage = async (content: string) => {
-    try {
-      setError(null);
-
-      const message = await sendGroupMessage(userId, groupId, content);
-
-      setMessages((prev) => [...prev, message]);
-
-      return message;
-    } catch (err) {
-      console.log(err);
-
-      setError("Failed to send message");
-    }
-  };
+    onSuccess: (message) => {
+      queryClient.setQueryData<GroupMessage[]>(
+        ["groupMessages", userId, groupId],
+        (prev = []) => [...prev, message],
+      );
+    },
+  });
 
   return {
-    loading,
-    error,
     messages,
+    loading,
+    sending,
+    error: fetchError || sendError,
     sendMessage,
-    refetch: fetchMessages,
+    refetch,
   };
 };

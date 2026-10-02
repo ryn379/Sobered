@@ -1,21 +1,12 @@
 import { useEffect, useState } from "react";
-
 import type { Group, GroupMember } from "../types";
-
 import type { User } from "../../home/types";
-
 import { useGroup } from "../hooks/useGroup";
-
 import { useGroupMessage } from "../hooks/useGroupMessage";
-
 import { GroupChatHeader } from "../components/chat/GroupChatHeader";
-
 import { GroupMessages } from "../components/chat/GroupMessages";
-
 import { GroupMembersProfile } from "../components/chat/GroupMembersProfile";
-
 import { GroupMessageInput } from "../components/chat/GroupMessageInput";
-
 import { useNavigate, useParams } from "react-router-dom";
 
 interface GroupChatPageProps {

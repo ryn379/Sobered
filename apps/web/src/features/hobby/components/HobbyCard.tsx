@@ -2,7 +2,7 @@ import type { Hobby } from "../types";
 
 interface HobbyCardProps {
   hobby: Hobby;
-  onDelete: (hobbyId: string) => Promise<boolean>;
+  onDelete: (hobbyId: string) => Promise<Hobby>;
   onSelect: (hobbyId: string) => void;
 }
 

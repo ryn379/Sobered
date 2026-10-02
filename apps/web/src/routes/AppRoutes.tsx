@@ -13,7 +13,7 @@ import GroupPage from "../features/group/pages/GroupPage.tsx";
 import GroupChatPage from "../features/group/pages/GroupChatPage.tsx";
 
 export const AppRoutes = () => {
-  const userId = "user_005";
+  const userId = "user_001";
   const role: User["role"] = "RECOVERING_USER";
   return (
     <Routes>

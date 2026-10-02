@@ -3,7 +3,7 @@ import { HobbyCard } from "./HobbyCard";
 
 interface HobbyListProps {
   hobbies: Hobby[];
-  onDelete: (hobbyId: string) => Promise<boolean>;
+  onDelete: (hobbyId: string) => Promise<Hobby>;
   onSelect: (hobbyId: string) => void;
 }
 
