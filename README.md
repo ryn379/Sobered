@@ -1,6 +1,6 @@
 # Sobered
 
-Sobered is an anonymous alcohol recovery and support platform.
+Sobered is an anonymous recovery and support platform.
 
 ## Applications
 
