@@ -1,21 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import type { SobrietySummary } from "../types";
-
 import { getSobriety, statsSobriety } from "../../../services/sobriety.service";
 
 export const useSobriety = (userId: string) => {
-  const [sobriety, setSobriety] = useState<SobrietySummary | null>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchSobriety = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
+  const { data: sobriety = null, isLoading: loading, error, refetch } = useQuery<SobrietySummary | null>({
+    queryKey: ["sobriety", userId],
+    queryFn: async () => {
       const [data, stats] = await Promise.all([
         getSobriety(userId),
         statsSobriety(userId),
@@ -29,23 +19,15 @@ export const useSobriety = (userId: string) => {
         totalDays: stats.totalDaysSober,
       };
 
-      setSobriety(summary);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load sobriety information");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchSobriety();
-  }, [fetchSobriety]);
+      return summary;
+    },
+    enabled: !!userId,
+  });
 
   return {
     sobriety,
     loading,
     error,
-    refetch: fetchSobriety,
+    refetch,
   };
 };

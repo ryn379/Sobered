@@ -2,7 +2,6 @@ import type { FriendRequestCardProps } from "../types";
 
 export const FriendRequestCard = ({
   requester,
-  onAccept,
   handleAccept,
   onDecline,
 }: FriendRequestCardProps) => {
@@ -25,7 +24,6 @@ export const FriendRequestCard = ({
       <div className="flex gap-2">
         <button
           onClick={() => {
-            onAccept(requester.id);
             handleAccept(requester.id);
           }}
           className="rounded-md bg-[#6E8CA0] px-3 py-2 text-xs font-medium text-[#14161B]"
@@ -36,7 +34,6 @@ export const FriendRequestCard = ({
         <button
           onClick={() => {
             onDecline(requester.id);
-            handleAccept(requester.id);
           }}
           className="rounded-md border border-[#2A2E36] px-3 py-2 text-xs text-[#9199A6]"
         >

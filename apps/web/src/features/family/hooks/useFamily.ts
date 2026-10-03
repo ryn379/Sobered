@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import type { SobrietyStats, User } from "../../home/types";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { User } from "../../home/types";
 import {
   getFamily,
   getRecovererFromFamily,
@@ -7,67 +8,48 @@ import {
 } from "../../../services/family.service";
 
 export const useFamily = (userId: string, role: User["role"]) => {
-  const [family, setFamily] = useState<User[]>([]);
-  const [recoverer, setRecoverer] = useState<User[]>([]);
-  const [sobrietyStats, setSobrietyStats] = useState<SobrietyStats | null>(
+  const [selectedRecovererId, setSelectedRecovererId] = useState<string | null>(
     null,
   );
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const familyQuery = useQuery({
+    queryKey: ["family", userId],
+    queryFn: () => getFamily(userId),
+    enabled: !!userId && role === "RECOVERING_USER",
+  });
 
-  const fetchEntries = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const recovererQuery = useQuery({
+    queryKey: ["recoverer", userId],
+    queryFn: () => getRecovererFromFamily(userId),
+    enabled: !!userId && role === "FAMILY_MEMBER",
+  });
 
-      if (role === "RECOVERING_USER") {
-        const familyData = await getFamily(userId);
+  const sobrietyQuery = useQuery({
+    queryKey: ["sobriety", userId, selectedRecovererId],
+    queryFn: () => sobrietyFamily(userId, selectedRecovererId!),
+    enabled: !!userId && !!selectedRecovererId,
+  });
 
-        setFamily(familyData);
-        setRecoverer([]);
-      }
-
-      if (role === "FAMILY_MEMBER") {
-        const recovererData = await getRecovererFromFamily(userId);
-
-        setRecoverer(recovererData);
-        setFamily([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch Family");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, role]);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
-
-  const getRecoverer = async (recovererId: string) => {
-    try {
-      const sobrietyData = await sobrietyFamily(userId, recovererId);
-
-      setSobrietyStats(sobrietyData);
-      return sobrietyData;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to get Recoverer details");
-      return null;
-    }
+  const getRecoverer = (recovererId: string) => {
+    setSelectedRecovererId(recovererId);
   };
 
   return {
-    loading,
-    error,
-
-    family,
-    recoverer,
-    sobrietyStats,
-
+    loading:
+      familyQuery.isLoading ||
+      recovererQuery.isLoading ||
+      sobrietyQuery.isLoading,
+    error: familyQuery.error || recovererQuery.error || sobrietyQuery.error,
+    family: familyQuery.data ?? [],
+    recoverer: recovererQuery.data ?? [],
+    sobrietyStats: sobrietyQuery.data ?? null,
     getRecoverer,
-    refetch: fetchEntries,
+    refetch: () => {
+      if (role === "RECOVERING_USER") {
+        return familyQuery.refetch();
+      }
+
+      return recovererQuery.refetch();
+    },
   };
 };

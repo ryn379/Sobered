@@ -1,48 +1,40 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import type { DiaryEntry } from "../types";
 import { deleteEntryDiary, getDiary } from "../../../services/diary.service";
 
 export const useDiary = (userId: string) => {
-  const [entries, setEntries] = useState<DiaryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchEntries = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const queryKey = ["diary", userId];
 
-      const data = await getDiary(userId);
+  const {
+    data: entries = [],
+    isLoading: loading,
+    error: fetchError,
+    refetch,
+  } = useQuery<DiaryEntry[]>({
+    queryKey,
+    queryFn: () => getDiary(userId),
+    enabled: !!userId,
+  });
 
-      setEntries(data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load diary entries.");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
+  const deleteMutation = useMutation({
+    mutationFn: (entryId: string) => deleteEntryDiary(userId, entryId),
 
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
-
-  const deleteEntry = async (entryId: string) => {
-    try {
-      await deleteEntryDiary(userId, entryId);
-
-      setEntries((current) => current.filter((entry) => entry.id !== entryId));
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete diary entry.");
-    }
-  };
+    onSuccess: (_, entryId) => {
+      queryClient.setQueryData<DiaryEntry[]>(queryKey, (current = []) =>
+        current.filter((entry) => entry.id !== entryId),
+      );
+    },
+  });
 
   return {
     entries,
     loading,
-    error,
-    refetch: fetchEntries,
-    deleteEntry,
+    error: fetchError || deleteMutation.error,
+    refetch,
+    deleteEntry: deleteMutation.mutateAsync,
+    deleting: deleteMutation.isPending,
   };
 };

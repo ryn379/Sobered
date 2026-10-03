@@ -17,7 +17,7 @@ export const DiaryPage = ({ userId }: { userId: string }) => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#14161B]">
         <p className="rounded-md border border-[#C97880]/30 bg-[#1C1F26] px-5 py-3 text-sm text-[#C97880]">
-          {error}
+          {error.message}
         </p>
       </div>
     );

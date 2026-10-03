@@ -1,27 +1,13 @@
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type { Analysis } from "../types";
 import { getAnalysisHobby } from "../../../services/hobby.service";
 
-export const useHobbyAnalysis = () => {
-  const [analysis, setAnalysis] = useState<Analysis | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const getAnalysis = async (userId: string, hobbyId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await getAnalysisHobby(userId, hobbyId);
-
-      setAnalysis(data);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch Analysis");
-    } finally {
-      setLoading(false);
-    }
-  };
+export const useHobbyAnalysis = (userId?: string, hobbyId?: string) => {
+  const { data: analysis = null, isLoading: loading, error, refetch: getAnalysis } = useQuery<Analysis | null>({
+    queryKey: ["hobbyAnalysis", userId, hobbyId],
+    queryFn: () => getAnalysisHobby(userId!, hobbyId!),
+    enabled: !!userId && !!hobbyId,
+  });
 
   return {
     analysis,

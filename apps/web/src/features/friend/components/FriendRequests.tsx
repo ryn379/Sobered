@@ -3,7 +3,6 @@ import { FriendRequestCard } from "./FriendRequestCard";
 
 export const FriendRequests = ({
   requests,
-  onAccept,
   handleAccept,
   onDecline,
 }: FriendRequestsProps) => {
@@ -32,7 +31,6 @@ export const FriendRequests = ({
           <FriendRequestCard
             key={requester.id}
             requester={requester}
-            onAccept={onAccept}
             handleAccept={handleAccept}
             onDecline={onDecline}
           />

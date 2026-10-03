@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { EmergencyRequest, User } from "../types";
 import {
   acceptEmergencyRequest,
@@ -9,97 +9,77 @@ import {
 } from "../../../services/emergency.service";
 
 export const useEmergency = (userId: string, role: User["role"]) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const queryKey = ["emergencies", userId];
 
-  const [emergencies, setEmergencies] = useState<EmergencyRequest[]>([]);
+  const {
+    data: emergencies = [],
+    isLoading: loading,
+    error: fetchError,
+    refetch: refetchEmergencies,
+  } = useQuery({
+    queryKey,
+    queryFn: () => getAllEmergencyRequest(userId),
+    enabled: !!userId,
+  });
 
-  const fetchEmergencies = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const emergencyData = await getAllEmergencyRequest(userId);
-
-      setEmergencies(emergencyData);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch emergencies");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchEmergencies();
-  }, [fetchEmergencies]);
-
-  const postRequest = async (type: string) => {
-    try {
+  const postMutation = useMutation({
+    mutationFn: async (type: string) => {
       if (role === "FAMILY_MEMBER") {
         throw new Error("Family member cannot");
       }
-      const response = await postEmergencyRequest(userId, type);
+      return postEmergencyRequest(userId, type);
+    },
+    onSuccess: (response) => {
+      queryClient.setQueryData<EmergencyRequest[]>(queryKey, (prev = []) => [
+        ...prev,
+        response,
+      ]);
+    },
+  });
 
-      return response;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to post emergency request");
-    }
-  };
-
-  const acceptRequest = async (reqId: string) => {
-    try {
+  const acceptMutation = useMutation({
+    mutationFn: async (reqId: string) => {
       if (role === "FAMILY_MEMBER") {
         throw new Error("Family member cannot");
       }
-      const response = await acceptEmergencyRequest(userId, reqId);
+      return acceptEmergencyRequest(userId, reqId);
+    },
+    onSuccess: (_, reqId) => {
+      queryClient.setQueryData<EmergencyRequest[]>(queryKey, (prev = []) =>
+        prev.filter((e) => e.id !== reqId),
+      );
+    },
+  });
 
-      // add more functionality here
-
-      setEmergencies((prev) => prev.filter((e) => e.id !== reqId));
-
-      return response;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to accept request");
-    }
-  };
-
-  const closeRequest = async (reqId: string) => {
-    try {
+  const closeMutation = useMutation({
+    mutationFn: async (reqId: string) => {
       if (role === "FAMILY_MEMBER") {
         throw new Error("Family member cannot");
       }
-      const response = await closeEmergencyRequest(userId, reqId);
+      return closeEmergencyRequest(userId, reqId);
+    },
+    onSuccess: (_, reqId) => {
+      queryClient.setQueryData<EmergencyRequest[]>(queryKey, (prev = []) =>
+        prev.filter((e) => e.id !== reqId),
+      );
+    },
+  });
 
-      setEmergencies((prev) => prev.filter((e) => e.id !== reqId));
-
-      return response;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to close request");
-    }
-  };
-
-  const escalateRequest = async (reqId: string) => {
-    try {
+  const escalateMutation = useMutation({
+    mutationFn: async (reqId: string) => {
       if (role === "FAMILY_MEMBER") {
         throw new Error("Family member cannot");
       }
-
       if (role !== "PROFESSIONAL") {
         throw new Error("Recovering user cannot escalate");
       }
-
-      const response = await escalateEmergencyRequest(userId, reqId);
-
-      return response;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to escalate");
-    }
-  };
+      return escalateEmergencyRequest(userId, reqId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
 
   const myEmergency = emergencies.find(
     (emergency) => emergency.userId === userId && emergency.status !== "CLOSED",
@@ -107,14 +87,13 @@ export const useEmergency = (userId: string, role: User["role"]) => {
 
   return {
     loading,
-    error,
-
+    error: fetchError || postMutation.error || acceptMutation.error || closeMutation.error || escalateMutation.error,
     emergencies,
     myEmergency,
-    postRequest,
-    acceptRequest,
-    closeRequest,
-    escalateRequest,
-    refetchEmergencies: fetchEmergencies,
+    postRequest: postMutation.mutateAsync,
+    acceptRequest: acceptMutation.mutateAsync,
+    closeRequest: closeMutation.mutateAsync,
+    escalateRequest: escalateMutation.mutateAsync,
+    refetchEmergencies,
   };
 };

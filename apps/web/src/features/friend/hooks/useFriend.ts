@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { User } from "../../home/types";
 
@@ -13,116 +13,118 @@ import {
 } from "../../../services/friend.service";
 
 export const useFriend = (userId: string) => {
-  const [friends, setFriends] = useState<User[]>([]);
-  const [requests, setRequests] = useState<User[]>([]);
-  const [suggestions, setSuggestions] = useState<User[]>([]);
+  const queryClient = useQueryClient();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const friendsKey = ["friends", userId];
+  const requestsKey = ["friendRequests", userId];
+  const suggestionsKey = ["friendSuggestions", userId];
 
-  const fetchFriends = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const {
+    data: friends = [],
+    isLoading: friendsLoading,
+    error: friendsError,
+    refetch: refetchFriends,
+  } = useQuery<User[]>({
+    queryKey: friendsKey,
+    queryFn: () => getFriends(userId),
+    enabled: !!userId,
+  });
 
-      const [friendsData, requestsData, suggestionsData] = await Promise.all([
-        getFriends(userId),
-        getRequestFriends(userId),
-        getSuggestionFriends(userId),
-      ]);
+  const {
+    data: requests = [],
+    isLoading: requestsLoading,
+    error: requestsError,
+    refetch: refetchRequests,
+  } = useQuery<User[]>({
+    queryKey: requestsKey,
+    queryFn: () => getRequestFriends(userId),
+    enabled: !!userId,
+  });
 
-      setFriends(friendsData);
-      setRequests(requestsData);
-      setSuggestions(suggestionsData);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load friends");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
+  const {
+    data: suggestions = [],
+    isLoading: suggestionsLoading,
+    error: suggestionsError,
+    refetch: refetchSuggestions,
+  } = useQuery<User[]>({
+    queryKey: suggestionsKey,
+    queryFn: () => getSuggestionFriends(userId),
+    enabled: !!userId,
+  });
 
-  useEffect(() => {
-    fetchFriends();
-  }, [fetchFriends]);
+  const addFriendMutation = useMutation({
+    mutationFn: (recipientId: string) =>
+      postRequestFriends(userId, recipientId),
 
-  const addFriend = async (recipientId: string) => {
-    try {
-      setError(null);
+    onSuccess: (_, recipientId) => {
+      queryClient.setQueryData<User[]>(suggestionsKey, (prev = []) =>
+        prev.filter((user) => user.id !== recipientId),
+      );
+    },
+  });
 
-      await postRequestFriends(userId, recipientId);
+  const acceptRequestMutation = useMutation({
+    mutationFn: (requesterId: string) =>
+      acceptRequestFriends(userId, requesterId),
 
-      setSuggestions((prev) => prev.filter((user) => user.id !== recipientId));
+    onSuccess: (_, requesterId) => {
+      queryClient.setQueryData<User[]>(requestsKey, (prev = []) =>
+        prev.filter((user) => user.id !== requesterId),
+      );
 
-      return true;
-    } catch (err) {
-      console.error(err);
-      setError("Failed to send friend request");
-      return false;
-    }
-  };
+      queryClient.invalidateQueries({
+        queryKey: friendsKey,
+      });
+    },
+  });
 
-  const acceptRequest = async (requesterId: string) => {
-    try {
-      setError(null);
+  const declineRequestMutation = useMutation({
+    mutationFn: (requesterId: string) =>
+      declineRequestFriends(userId, requesterId),
 
-      const request = await acceptRequestFriends(userId, requesterId);
+    onSuccess: (_, requesterId) => {
+      queryClient.setQueryData<User[]>(requestsKey, (prev = []) =>
+        prev.filter((user) => user.id !== requesterId),
+      );
+    },
+  });
 
-      setRequests((prev) => prev.filter((user) => user.id !== requesterId));
+  const removeFriendMutation = useMutation({
+    mutationFn: (friendId: string) => deleteFriend(userId, friendId),
 
-      return request;
-    } catch (err) {
-      console.error(err);
-      setError("Failed to accept friend request");
-      return null;
-    }
-  };
-
-  const declineRequest = async (requesterId: string) => {
-    try {
-      setError(null);
-
-      const request = await declineRequestFriends(userId, requesterId);
-
-      setRequests((prev) => prev.filter((user) => user.id !== requesterId));
-
-      return request;
-    } catch (err) {
-      console.error(err);
-      setError("Failed to decline friend request");
-      return null;
-    }
-  };
-
-  const removeFriend = async (friendId: string) => {
-    try {
-      setError(null);
-
-      await deleteFriend(userId, friendId);
-
-      setFriends((prev) => prev.filter((user) => user.id !== friendId));
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      setError("Failed to remove friend");
-      return false;
-    }
-  };
+    onSuccess: (_, friendId) => {
+      queryClient.setQueryData<User[]>(friendsKey, (prev = []) =>
+        prev.filter((user) => user.id !== friendId),
+      );
+    },
+  });
 
   return {
     friends,
     requests,
     suggestions,
+    loading: friendsLoading || requestsLoading || suggestionsLoading,
+    error:
+      friendsError ||
+      requestsError ||
+      suggestionsError ||
+      addFriendMutation.error ||
+      acceptRequestMutation.error ||
+      declineRequestMutation.error ||
+      removeFriendMutation.error,
+    addFriend: addFriendMutation.mutateAsync,
+    acceptRequest: acceptRequestMutation.mutateAsync,
+    declineRequest: declineRequestMutation.mutateAsync,
+    removeFriend: removeFriendMutation.mutateAsync,
+    addingFriend: addFriendMutation.isPending,
+    acceptingRequest: acceptRequestMutation.isPending,
+    decliningRequest: declineRequestMutation.isPending,
+    removingFriend: removeFriendMutation.isPending,
 
-    loading,
-    error,
-
-    addFriend,
-    acceptRequest,
-    declineRequest,
-    removeFriend,
-
-    refetch: fetchFriends,
+    refetch: () => {
+      refetchFriends();
+      refetchRequests();
+      refetchSuggestions();
+    },
   };
 };

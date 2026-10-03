@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Group } from "../types";
 import {
   assignLeaderGroup,
@@ -13,137 +13,148 @@ import {
 } from "../../../services/group.service";
 
 export const useGroup = (userId: string) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const [groups, setGroups] = useState<Group[]>([]);
+  const groupsKey = ["groups", userId];
 
-  const fetchEntries = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const groupsData = await getGroups(userId);
-
-      setGroups(groupsData);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch entries");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
+  const {
+    data: groups = [],
+    isLoading: loading,
+    error: groupsError,
+    refetch,
+  } = useQuery<Group[]>({
+    queryKey: groupsKey,
+    queryFn: () => getGroups(userId),
+    enabled: !!userId,
+  });
 
   const groupGet = async (groupId: string) => {
-    try {
-      const result = await getGroup(userId, groupId);
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to find group");
-    }
-  };
-
-  const groupJoin = async (groupId: string) => {
-    try {
-      const result = await joinGroup(userId, groupId);
-
-      const joinedGroup = await getGroup(userId, result.groupId);
-
-      setGroups((prev) => [...prev, joinedGroup]);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to join group");
-    }
-  };
-
-  const groupLeave = async (groupId: string) => {
-    try {
-      const result = await leaveGroup(userId, groupId);
-
-      setGroups((prev) => prev.filter((e) => e.id !== result.id));
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("You shall not leave");
-    }
+    return queryClient.fetchQuery({
+      queryKey: ["group", userId, groupId],
+      queryFn: () => getGroup(userId, groupId),
+    });
   };
 
   const groupMembers = async (groupId: string) => {
-    try {
-      const result = await membersGroup(userId, groupId);
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch members");
-    }
+    return queryClient.fetchQuery({
+      queryKey: ["groupMembers", userId, groupId],
+      queryFn: () => membersGroup(userId, groupId),
+    });
   };
 
   const groupLeaders = async (groupId: string) => {
-    try {
-      const result = await leaderGroup(userId, groupId);
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch leaders");
-    }
+    return queryClient.fetchQuery({
+      queryKey: ["groupLeaders", userId, groupId],
+      queryFn: () => leaderGroup(userId, groupId),
+    });
   };
 
-  const groupLeaderAssign = async (memberId: string, groupId: string) => {
-    try {
-      const result = await assignLeaderGroup(userId, memberId, groupId);
+  const groupJoinMutation = useMutation({
+    mutationFn: (groupId: string) => joinGroup(userId, groupId),
 
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("You are not worthy of leadership");
-    }
-  };
+    onSuccess: async (result) => {
+      const joinedGroup = await getGroup(userId, result.groupId);
 
-  const groupLeaderRemove = async (removedId: string, groupId: string) => {
-    try {
-      const result = await removeLeaderGroup(userId, removedId, groupId);
+      queryClient.setQueryData<Group[]>(groupsKey, (prev = []) => [
+        ...prev,
+        joinedGroup,
+      ]);
+    },
+  });
 
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("your resignation is not accepted");
-    }
-  };
+  const groupLeaveMutation = useMutation({
+    mutationFn: (groupId: string) => leaveGroup(userId, groupId),
 
-  const groupUserRemove = async (removedId: string, groupId: string) => {
-    try {
-      const result = await removeUserGroup(userId, removedId, groupId);
+    onSuccess: (result) => {
+      queryClient.setQueryData<Group[]>(groupsKey, (prev = []) =>
+        prev.filter((group) => group.id !== result.id),
+      );
+    },
+  });
 
-      return result;
-    } catch (err) {
-      console.log(err);
-      setError("your resignation is not accepted");
-    }
-  };
+  const groupLeaderAssignMutation = useMutation({
+    mutationFn: ({
+      memberId,
+      groupId,
+    }: {
+      memberId: string;
+      groupId: string;
+    }) => assignLeaderGroup(userId, memberId, groupId),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupLeaders", userId, variables.groupId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", userId, variables.groupId],
+      });
+    },
+  });
+
+  const groupLeaderRemoveMutation = useMutation({
+    mutationFn: ({
+      removedId,
+      groupId,
+    }: {
+      removedId: string;
+      groupId: string;
+    }) => removeLeaderGroup(userId, removedId, groupId),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupLeaders", userId, variables.groupId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", userId, variables.groupId],
+      });
+    },
+  });
+
+  const groupUserRemoveMutation = useMutation({
+    mutationFn: ({
+      removedId,
+      groupId,
+    }: {
+      removedId: string;
+      groupId: string;
+    }) => removeUserGroup(userId, removedId, groupId),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["groupMembers", userId, variables.groupId],
+      });
+    },
+  });
 
   return {
-    loading,
-    error,
-
     groups,
 
+    loading,
+    error:
+      groupsError ||
+      groupJoinMutation.error ||
+      groupLeaveMutation.error ||
+      groupLeaderAssignMutation.error ||
+      groupLeaderRemoveMutation.error ||
+      groupUserRemoveMutation.error,
+
     groupGet,
-    groupJoin,
-    groupLeave,
     groupMembers,
     groupLeaders,
-    groupLeaderAssign,
-    groupLeaderRemove,
-    groupUserRemove,
-    refetch: fetchEntries,
+
+    groupJoin: groupJoinMutation.mutateAsync,
+    groupLeave: groupLeaveMutation.mutateAsync,
+    groupLeaderAssign: groupLeaderAssignMutation.mutateAsync,
+    groupLeaderRemove: groupLeaderRemoveMutation.mutateAsync,
+    groupUserRemove: groupUserRemoveMutation.mutateAsync,
+
+    joining: groupJoinMutation.isPending,
+    leaving: groupLeaveMutation.isPending,
+    assigningLeader: groupLeaderAssignMutation.isPending,
+    removingLeader: groupLeaderRemoveMutation.isPending,
+    removingUser: groupUserRemoveMutation.isPending,
+    refetch,
   };
 };

@@ -26,7 +26,7 @@ export const FriendPage = ({ userId }: UserProps) => {
   const handleAccept = async (requesterId: string) => {
     await acceptRequest(requesterId);
 
-    await refetch();
+    refetch();
 
     setActive("friends");
   };
@@ -42,7 +42,7 @@ export const FriendPage = ({ userId }: UserProps) => {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#14161B]">
-        <p className="text-sm text-[#C97880]">{error}</p>
+        <p className="text-sm text-[#C97880]">{error.message}</p>
       </div>
     );
   }
@@ -64,7 +64,6 @@ export const FriendPage = ({ userId }: UserProps) => {
             <FriendRequests
               requests={requests}
               handleAccept={handleAccept}
-              onAccept={acceptRequest}
               onDecline={declineRequest}
             />
           )}

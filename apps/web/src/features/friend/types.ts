@@ -20,7 +20,6 @@ export interface FriendHeaderProps {
 export interface FriendRequestsProps {
   requests: User[];
 
-  onAccept: (requesterId: string) => void;
   handleAccept: (requesterId: string) => void;
   onDecline: (requesterId: string) => void;
 }
@@ -28,7 +27,6 @@ export interface FriendRequestsProps {
 export interface FriendRequestCardProps {
   requester: User;
 
-  onAccept: (requesterId: string) => void;
   handleAccept: (requesterId: string) => void;
   onDecline: (requesterId: string) => void;
 }

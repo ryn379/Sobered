@@ -46,7 +46,7 @@ export const SponsorPage = ({ userId }: { userId: string }) => {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#14161B]">
-        <p className="text-sm text-[#C97880]">{error}</p>
+        <p className="text-sm text-[#C97880]">{error.message}</p>
       </div>
     );
   }

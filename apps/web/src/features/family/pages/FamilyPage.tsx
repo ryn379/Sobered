@@ -16,7 +16,7 @@ export const FamilyPage = ({
   userId: string;
   role: User["role"];
 }) => {
-  const { loading, error, family, recoverer, sobrietyStats, getRecoverer } =
+  const { family, recoverer, sobrietyStats, loading, error, getRecoverer } =
     useFamily(userId, role);
 
   const [selectedRecoverer, setSelectedRecoverer] = useState<User | null>(null);
@@ -46,7 +46,7 @@ export const FamilyPage = ({
     return (
       <main className="min-h-screen bg-[#14161B]">
         <div className="mx-auto max-w-5xl px-6 py-8 md:px-10">
-          <p className="text-sm text-[#C97880]">{error}</p>
+          <p className="text-sm text-[#C97880]">{error.message}</p>
         </div>
       </main>
     );

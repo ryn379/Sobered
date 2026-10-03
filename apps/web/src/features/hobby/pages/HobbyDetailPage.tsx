@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { HobbyAnalysis } from "../components/HobbyAnalysis";
@@ -16,16 +15,7 @@ export const HobbyDetailPage = ({ userId }: { userId: string }) => {
     analysis,
     loading: analysisLoading,
     error: analysisError,
-    getAnalysis,
-  } = useHobbyAnalysis();
-
-  useEffect(() => {
-    if (!hobbyId) {
-      return;
-    }
-
-    getAnalysis(userId, hobbyId);
-  }, [hobbyId]);
+  } = useHobbyAnalysis(userId, hobbyId);
 
   if (!hobbyId) {
     return (
@@ -49,7 +39,7 @@ export const HobbyDetailPage = ({ userId }: { userId: string }) => {
 
           {analysisError && (
             <p className="rounded-md border border-[#C97880]/30 bg-[#1C1F26] p-4 text-[#C97880]">
-              {analysisError}
+              {analysisError.message}
             </p>
           )}
 

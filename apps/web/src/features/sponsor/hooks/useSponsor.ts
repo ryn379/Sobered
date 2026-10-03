@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "../../home/types";
 import {
   acceptSponsor,
@@ -12,110 +12,110 @@ import {
 import { userHome } from "../../../services/user.service";
 
 export const useSponsor = (userId: string) => {
-  const [sponsor, setSponsor] = useState<User | null | User[]>(null);
-  const [requests, setRequests] = useState<User[]>([]);
-  const [mentees, setMentees] = useState<User[]>([]);
-  const [suggestions, setSuggestions] = useState<User[]>([]);
+  const queryClient = useQueryClient();
+  const queryKey = ["sponsorData", userId];
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchEntries = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const [
-        sponsorData,
-        sponsorReqData,
-        sponsorMentees,
-        sponsorSuggestionData,
-      ] = await Promise.all([
+  const { data, isLoading: loading, error: fetchError, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const [sponsor, requests, mentees, suggestions] = await Promise.all([
         getSponsor(userId),
         getReqsSponsor(userId),
         getMentee(userId),
         getSuggestions(userId),
       ]);
+      return { sponsor, requests, mentees, suggestions };
+    },
+    enabled: !!userId,
+  });
 
-      setSponsor(sponsorData);
-      setRequests(sponsorReqData);
-      setMentees(sponsorMentees);
-      setSuggestions(sponsorSuggestionData);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to fetch entries");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
-
-  const sponsorAccept = async (requesterId: string) => {
-    try {
-      setError(null);
-
+  const acceptMutation = useMutation({
+    mutationFn: async (requesterId: string) => {
       const acceptedReq = await acceptSponsor(userId, requesterId);
-
       const { user: mentee } = await userHome(acceptedReq.requesterId);
+      return mentee;
+    },
+    onSuccess: (mentee) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          requests: oldData.requests.filter((r: User) => r.id !== mentee.id),
+          mentees: [...oldData.mentees, mentee],
+        };
+      });
+    },
+  });
 
-      setMentees((prev) => [...prev, mentee]);
+  const declineMutation = useMutation({
+    mutationFn: async (requesterId: string) => {
+      return declineSponsor(userId, requesterId);
+    },
+    onSuccess: (_, requesterId) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          requests: oldData.requests.filter((r: User) => r.id !== requesterId),
+        };
+      });
+    },
+  });
 
+  const postMutation = useMutation({
+    mutationFn: async (recipientId: string) => {
+      return postReqSponsor(userId, recipientId);
+    },
+    onSuccess: (request) => {
+      queryClient.setQueryData(queryKey, (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          suggestions: oldData.suggestions.filter(
+            (s: User) => s.id !== request.recipientId
+          ),
+        };
+      });
+    },
+  });
+
+  const acceptWrapper = async (requesterId: string) => {
+    try {
+      await acceptMutation.mutateAsync(requesterId);
       return true;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to accept sponsor request");
+    } catch {
       return false;
     }
   };
 
-  const sponsorDecline = async (requesterId: string) => {
+  const declineWrapper = async (requesterId: string) => {
     try {
-      setError(null);
-
-      const declinedReq = await declineSponsor(userId, requesterId);
-
-      setRequests((prev) => prev.filter((user) => user.id !== requesterId));
-      if (declinedReq) return true;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to decline sponsor request");
+      await declineMutation.mutateAsync(requesterId);
+      return true;
+    } catch {
       return false;
     }
   };
 
-  const sponsorPost = async (recepientId: string) => {
+  const postWrapper = async (recipientId: string) => {
     try {
-      setError(null);
-
-      const request = await postReqSponsor(userId, recepientId);
-
-      setSuggestions((prev) =>
-        prev.filter((e) => e.id !== request.recipientId),
-      );
-
-      if (request) return true;
-    } catch (err) {
-      console.log(err);
-      setError("Failed to sent sponsor request");
+      await postMutation.mutateAsync(recipientId);
+      return true;
+    } catch {
       return false;
     }
   };
 
   return {
     loading,
-    error,
-
-    sponsor,
-    requests,
-    mentees,
-    suggestions,
-
-    sponsorAccept,
-    sponsorDecline,
-    sponsorPost,
-    refetch: fetchEntries,
+    error: fetchError || acceptMutation.error || declineMutation.error || postMutation.error,
+    sponsor: data?.sponsor || null,
+    requests: data?.requests || [],
+    mentees: data?.mentees || [],
+    suggestions: data?.suggestions || [],
+    sponsorAccept: acceptWrapper,
+    sponsorDecline: declineWrapper,
+    sponsorPost: postWrapper,
+    refetch,
   };
 };
